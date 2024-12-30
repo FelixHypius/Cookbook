@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import '../database/database_service.dart';
-import '../util/colors.dart';
 import '../base_widgets/base_dropdown_button.dart';
 import '../base_widgets/base_future_builder.dart';
 
 class SpecSectionDropdownButton extends StatefulWidget {
-  const SpecSectionDropdownButton({super.key});
+  final String? preSelectionId;
+  const SpecSectionDropdownButton({super.key, this.preSelectionId});
 
   @override
   SpecSectionDropdownButtonState createState() => SpecSectionDropdownButtonState();
@@ -18,6 +18,23 @@ class SpecSectionDropdownButtonState extends State<SpecSectionDropdownButton> {
   String? get selectedSection {
     if (section == 'recipe category') return null;
     return section;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeSection();
+  }
+
+  Future<void> _initializeSection() async {
+    if (widget.preSelectionId != null) {
+      String? preSelectedSection = await dbs.getSectionTitle(widget.preSelectionId!);
+      if (preSelectedSection != null) {
+        setState(() {
+          section = preSelectedSection;
+        });
+      }
+    }
   }
 
   @override

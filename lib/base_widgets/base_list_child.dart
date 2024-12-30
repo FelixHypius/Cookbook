@@ -61,7 +61,7 @@ class BaseListChild extends GestureDetector{
                           );
                         },
                         errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
-                          return Center(child: Text('Failed to load image'));
+                          return Center(child: Text('Failed to load image.'));
                         },
                       ),
                     )

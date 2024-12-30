@@ -12,8 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/gestures.dart';
 import 'package:email_validator/email_validator.dart';
 
-class LoginPage extends StatefulWidget{
-
+class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
   @override
@@ -41,7 +40,7 @@ class LoginPageState extends State<LoginPage> {
             screenHeight: screenHeight,
           ),
           Container(
-            height: screenHeight*0.1,
+            height: screenHeight * 0.1,
           ),
           Padding(
             padding: EdgeInsets.only(top: 10, bottom: 10),
@@ -65,13 +64,13 @@ class LoginPageState extends State<LoginPage> {
             children: [
               Checkbox(
                 side: BorderSide(
-                    color: MyColors.myWhite,
-                    width: 3
+                  color: MyColors.myWhite,
+                  width: 3,
                 ),
                 checkColor: MyColors.myWhite,
                 activeColor: MyColors.myRed,
                 value: checked,
-                onChanged: (bool? value){
+                onChanged: (bool? value) {
                   setState(() {
                     checked = value ?? false;
                   });
@@ -82,14 +81,14 @@ class LoginPageState extends State<LoginPage> {
                 style: CustomTextStyle(
                   size: 12.5,
                 ),
-              )
+              ),
             ],
           ),
           Padding(
-            padding: EdgeInsets.only(top: 30, bottom: 15, left: screenWidth*0.25, right: screenWidth*0.25),
+            padding: EdgeInsets.only(top: 30, bottom: 15, left: screenWidth * 0.25, right: screenWidth * 0.25),
             child: OutlinedButton(
               onPressed: login,
-              style: CustomButtonStyle(backColor: MyColors.myWhite, borderColor: MyColors.myGrey,),
+              style: CustomButtonStyle(backColor: MyColors.myWhite, borderColor: MyColors.myGrey),
               child: Text(
                 "Log in!",
                 style: CustomTextStyle(size: 15, colour: MyColors.myBlack),
@@ -97,34 +96,44 @@ class LoginPageState extends State<LoginPage> {
             ),
           ),
           Container(
-            height: screenHeight*0.1,
+            height: screenHeight * 0.1,
           ),
           Center(
             child: RichText(
               text: TextSpan(
-                  text: 'If this is your first time cooking, please ',
-                  style: CustomTextStyle(
-                    size: 12.5,
+                text: 'If this is your first time cooking, please ',
+                style: CustomTextStyle(
+                  size: 12.5,
+                ),
+                children: [
+                  TextSpan(
+                    text: 'register!',
+                    style: CustomTextStyle(
+                      size: 12.5,
+                      underlined: true,
+                    ),
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => RegisterPage()),
+                      ),
                   ),
-                  children: [
-                    TextSpan(
-                      text: 'register!',
-                      style: CustomTextStyle(
-                          size: 12.5,
-                          underlined: true
-                      ),
-                      recognizer: TapGestureRecognizer()..onTap = () => Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => RegisterPage()
-                        )
-                      ),
-                    )
-                  ]
+                ],
               ),
             ),
-          )
+          ),
+          // Forgot Password Section
+          Center(
+            child: TextButton(
+              onPressed: resetPassword,  // Trigger password reset
+              child: Text(
+                "Forgot Password?",
+                style: CustomTextStyle(size: 12.5, underlined: true),
+              ),
+            ),
+          ),
         ],
-      )
+      ),
     );
   }
 
@@ -133,7 +142,6 @@ class LoginPageState extends State<LoginPage> {
     final remember = prefs.getBool('remember') ?? false;
 
     if (remember) {
-      // Navigate to the homepage
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const Homepage()),
@@ -142,7 +150,7 @@ class LoginPageState extends State<LoginPage> {
       String email = _emailController.text;
       String password = _passwordController.text;
 
-      if (email.isEmpty || password.isEmpty){
+      if (email.isEmpty || password.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text("I don't remember you 😥. Please login using your credentials."),
@@ -152,13 +160,14 @@ class LoginPageState extends State<LoginPage> {
         if (EmailValidator.validate(email)) {
           try {
             UserCredential userCredential = await _auth.signInWithEmailAndPassword(
-                email: email,
-                password: password
+              email: email,
+              password: password,
             );
 
-            // Login successful
             await prefs.setString('email', email);
-            checked ? await prefs.setBool('remember', true) : await prefs.setBool('remember', false);
+            checked
+                ? await prefs.setBool('remember', true)
+                : await prefs.setBool('remember', false);
 
             Navigator.pushReplacement(
               context,
@@ -167,17 +176,48 @@ class LoginPageState extends State<LoginPage> {
           } on FirebaseAuthException catch (e) {
             if (e.code == "user-not-found") {
               ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("No user found for that email."),)
+                const SnackBar(content: Text("No user found for that email.")),
               );
             } else if (e.code == "wrong-password") {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text("Incorrect password.")),
+              );
+            } else if (e.code == "invalid-credential") {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text("Invalid credentials, please reset password!")),
               );
             }
           }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text("Invalid email.")),
+          );
+        }
+      }
+    }
+  }
+
+  Future<void> resetPassword() async {
+    String email = _emailController.text;
+
+    if (email.isEmpty || !EmailValidator.validate(email)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please enter a valid email address.")),
+      );
+    } else {
+      try {
+        await _auth.sendPasswordResetEmail(email: email);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Password reset email sent!")),
+        );
+      } on FirebaseAuthException catch (e) {
+        if (e.code == "user-not-found") {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("No user found for that email.")),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Error: ${e.message}")),
           );
         }
       }

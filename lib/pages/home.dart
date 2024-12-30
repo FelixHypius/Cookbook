@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:cookbook/base_widgets/base_input_field.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../base_widgets/base_scaffold.dart';
 import '../base_widgets/base_drawer.dart';
 import '../base_widgets/base_bottom_navigation_bar.dart';
@@ -49,7 +52,7 @@ class HomepageState extends State<Homepage> {
             ),
             Expanded(
               child: BaseStreamBuilder(
-                streamm: FirebaseDatabase.instance.ref().child('sections').onValue,
+                streamm: fetchOnceAndStream('sections'),
                 buildd: (context, valueList) {
                   if (valueList == null || valueList.isEmpty) return Center(child: Text('No sections available.', style: CustomTextStyle(size: 15, colour: MyColors.myRed),));
                   final List<dynamic> values = List<dynamic>.from(valueList);
@@ -66,5 +69,34 @@ class HomepageState extends State<Homepage> {
         )
     );
   }
+  Stream<DataSnapshot> fetchOnceAndStream(String path) {
+    final ref = FirebaseDatabase.instance.ref().child(path);
+
+    // Use a StreamController to handle the combination of fetching once and listening to changes
+    final controller = StreamController<DataSnapshot>();
+
+    // Emit the initial data
+    ref.get().then((snapshot) {
+      if (snapshot.exists) {
+        controller.add(snapshot);
+      }
+      // After emitting initial data, start listening to changes
+      ref.onValue.listen((event) {
+        controller.add(event.snapshot);
+      });
+    }).catchError((error) {
+      controller.addError(error);
+    });
+
+    // Close the controller when the listener is done
+    controller.onCancel = () {
+      controller.close();
+    };
+
+    return controller.stream;
+  }
+
+
 }
+
 

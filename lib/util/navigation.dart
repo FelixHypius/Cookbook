@@ -1,5 +1,6 @@
 import '../pages/add_recipe.dart';
 import 'package:flutter/material.dart';
+import '../pages/edit_recipe.dart';
 import '../pages/recipe.dart';
 import 'custom_page_route.dart';
 import '../pages/home.dart';
@@ -48,5 +49,9 @@ void navigateToPage(
     // Navigate to Add section page
       scaffoldState?.closeDrawer();
       Navigator.of(context).push(CustomPageRoute(page: const AddSectionPage(), direction: direction??'horizontalL'));
+    case 7:
+    // Navigate to edit recipe page
+      scaffoldState?.closeDrawer();
+      Navigator.of(context).push(CustomPageRoute(page: EditRecipePage(recipeId: recipeId!,), direction: direction??'vertical'));
   }
 }

@@ -60,9 +60,9 @@ class AddRecipePageState extends State<AddRecipePage> {
           navigateToPage(context, 1, 3);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Your image could not be uploaded.'),
-            )
+              SnackBar(
+                content: Text('Your image could not be uploaded.'),
+              )
           );
         }
       }
@@ -94,14 +94,18 @@ class AddRecipePageState extends State<AddRecipePage> {
   }
 
   Future<String?> uploadImage() async {
-    if ((_imagePickerKey.currentState as SpecImagePickerState).image == null) return null;
+    final imagePickerState = _imagePickerKey.currentState;
+    if (imagePickerState?.image == null) return null;
+
     try {
-      return dbs.uploadImg(await comp.compress((_imagePickerKey.currentState as SpecImagePickerState).image!, 204800));
+      final compressedImage = await comp.compress(imagePickerState!.image!, 204800);
+      return dbs.uploadImg(compressedImage, category: "recipes");
     } catch (e) {
       print('Error uploading image: ${e.toString()}');
       return null;
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -117,117 +121,117 @@ class AddRecipePageState extends State<AddRecipePage> {
         scaffoldKey: _scaffoldKey,
       ),
       body: SingleChildScrollView(
-        child: Stack(
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                AspectRatio(
-                  aspectRatio: 1,
-                  child: Container(
-                    decoration: BoxDecoration(
-                        color: MyColors.myBlack,
-                        border: Border.all(
-                            color: MyColors.myGrey,
-                            width: 1
-                        ),
-                        borderRadius: BorderRadius.circular(20)
-                    ),
-                    child: SpecImagePicker(key: _imagePickerKey,),
-                  ),
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                Padding(
-                  padding: EdgeInsets.only(left: 5, right: 5),
-                  child: BaseInputField(
-                    control: _nameController,
-                    hintText: 'Enter recipe title',
-                    fillColour: MyColors.myBlack,
-                    normalColour: MyColors.myBlack,
-                    focusedColour: MyColors.myBlack,
-                    textColour: MyColors.myWhite,
-                    textAlignment: TextAlign.center,
-                    textSize: 20,
-                    paddingHeight: 5,
-                    hintColour: MyColors.myGrey,
-                    maxRows: 1,
-                  ),
-                ),
-                SizedBox(
-                    height: 20
-                ),
-                Divider(
-                  color: MyColors.myGrey,
-                  thickness: 2,
-                  height: 5,
-                ),
-                Padding(
-                    padding: EdgeInsets.only(top: 15, left: 5, right: 5, bottom: 15),
-                    child: SpecIngredientList(key: _ingredientListKey,)
-                ),
-                Divider(
-                  color: MyColors.myGrey,
-                  thickness: 2,
-                  height: 5,
-                ),
-                Padding(
-                    padding: EdgeInsets.only(left: 5, right: 5, bottom: 15),
-                    child: BaseInputField(
-                      hintText: 'Please enter the steps for your recipe..',
-                      control: _recipeController,
-                      fillColour: MyColors.myBlack,
-                      focusedColour: MyColors.myBlack,
-                      normalColour: MyColors.myBlack,
-                      textColour: MyColors.myWhite,
-                      maxRows: null,
-                    )
-                ),
-                Divider(
-                  color: MyColors.myGrey,
-                  thickness: 2,
-                  height: 0,
-                ),
-                Padding(
-                  padding: EdgeInsets.only(left: 5, right: 5, top: 10),
-                  child: SpecSectionDropdownButton(key: _sectionDropdownKey,),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(left: 5, right: 5, top: 20),
-                  child: SizedBox(
-                    width: 70,
-                    height: 30,
-                    child: CustomButton(
-                      func: _save,
-                      icon: Icon(Icons.save_rounded, size: 25, color: MyColors.myWhite,),
-                      text: Text('save', style: CustomTextStyle(size: 15, tallness: 2), textAlign: TextAlign.center,),
-                      border: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(7.5)
+          child: Stack(
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  AspectRatio(
+                    aspectRatio: 1,
+                    child: Container(
+                      decoration: BoxDecoration(
+                          color: MyColors.myBlack,
+                          border: Border.all(
+                              color: MyColors.myGrey,
+                              width: 1
+                          ),
+                          borderRadius: BorderRadius.circular(20)
                       ),
-                      align: MainAxisAlignment.start,
-                      padding: EdgeInsets.only(left: 5),
-                      sizeSpace: 2,
+                      child: SpecImagePicker(key: _imagePickerKey,),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(left: 5, right: 5),
+                    child: BaseInputField(
+                      control: _nameController,
+                      hintText: 'Enter recipe title',
+                      fillColour: MyColors.myBlack,
+                      normalColour: MyColors.myBlack,
+                      focusedColour: MyColors.myBlack,
+                      textColour: MyColors.myWhite,
+                      textAlignment: TextAlign.center,
+                      textSize: 20,
+                      paddingHeight: 5,
+                      hintColour: MyColors.myGrey,
+                      maxRows: 1,
+                    ),
+                  ),
+                  SizedBox(
+                      height: 20
+                  ),
+                  Divider(
+                    color: MyColors.myGrey,
+                    thickness: 2,
+                    height: 5,
+                  ),
+                  Padding(
+                      padding: EdgeInsets.only(top: 15, left: 5, right: 5, bottom: 15),
+                      child: SpecIngredientList(key: _ingredientListKey,)
+                  ),
+                  Divider(
+                    color: MyColors.myGrey,
+                    thickness: 2,
+                    height: 5,
+                  ),
+                  Padding(
+                      padding: EdgeInsets.only(left: 5, right: 5, bottom: 15),
+                      child: BaseInputField(
+                        hintText: 'Please enter the steps for your recipe..',
+                        control: _recipeController,
+                        fillColour: MyColors.myBlack,
+                        focusedColour: MyColors.myBlack,
+                        normalColour: MyColors.myBlack,
+                        textColour: MyColors.myWhite,
+                        maxRows: null,
+                      )
+                  ),
+                  Divider(
+                    color: MyColors.myGrey,
+                    thickness: 2,
+                    height: 0,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(left: 5, right: 5, top: 10),
+                    child: SpecSectionDropdownButton(key: _sectionDropdownKey,),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(left: 5, right: 5, top: 20),
+                    child: SizedBox(
+                      width: 70,
+                      height: 30,
+                      child: CustomButton(
+                        func: _save,
+                        icon: Icon(Icons.save_rounded, size: 25, color: MyColors.myWhite,),
+                        text: Text('save', style: CustomTextStyle(size: 15, tallness: 2), textAlign: TextAlign.center,),
+                        border: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(7.5)
+                        ),
+                        align: MainAxisAlignment.start,
+                        padding: EdgeInsets.only(left: 5),
+                        sizeSpace: 2,
+                      ),
+                    ),
+                  )
+                ],
+              ),
+              if (_isLoading)
+                Positioned.fill(
+                  child: Container(
+                    color: MyColors.myBlack,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CircularProgressIndicator(color: MyColors.myRed, strokeWidth: 5,),
+                        Text('Waiting for recipe upload', style: CustomTextStyle(size: 20, colour: MyColors.myRed))
+                      ],
                     ),
                   ),
                 )
-              ],
-            ),
-            if (_isLoading)
-              Positioned.fill(
-                child: Container(
-                  color: MyColors.myBlack,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      CircularProgressIndicator(color: MyColors.myRed, strokeWidth: 5,),
-                      Text('Waiting for recipe upload', style: CustomTextStyle(size: 20, colour: MyColors.myRed))
-                    ],
-                  ),
-                ),
-              )
-          ],
-        )
+            ],
+          )
       ),
     );
   }

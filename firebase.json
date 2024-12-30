@@ -1,1 +1,40 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"felix-s-cookbook","appId":"1:677004070215:android:a1ff0419ff736893ead062","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"felix-s-cookbook","configurations":{"android":"1:677004070215:android:a1ff0419ff736893ead062","ios":"1:677004070215:ios:a8aadc6f02f2ec21ead062","macos":"1:677004070215:ios:a8aadc6f02f2ec21ead062","web":"1:677004070215:web:6e5d716342de77a2ead062","windows":"1:677004070215:web:3a044c0a4a0821f2ead062"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "felix-s-cookbook",
+          "appId": "1:677004070215:android:a1ff0419ff736893ead062",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "felix-s-cookbook",
+          "configurations": {
+            "android": "1:677004070215:android:a1ff0419ff736893ead062",
+            "ios": "1:677004070215:ios:a8aadc6f02f2ec21ead062",
+            "macos": "1:677004070215:ios:a8aadc6f02f2ec21ead062",
+            "web": "1:677004070215:web:6e5d716342de77a2ead062",
+            "windows": "1:677004070215:web:3a044c0a4a0821f2ead062"
+          }
+        }
+      }
+    }
+  },
+  "hosting": {
+    "site": "felix-s-cookbook",
+    "public": "build/web",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}

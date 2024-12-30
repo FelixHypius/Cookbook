@@ -5,6 +5,11 @@ class InputCheck {
     return numeric.hasMatch(input);
   }
 
+  bool isQty (String input) {
+    RegExp qty = RegExp(r'^(\d+(\.\d+)?|\d+/\d+)$');
+    return qty.hasMatch(input);
+  }
+
   bool isNumeric0 (String input) {
     RegExp numeric = RegExp(r'^[0-9]+$');
     return numeric.hasMatch(input);

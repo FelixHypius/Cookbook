@@ -1,19 +1,11 @@
-import 'dart:io';
 import 'dart:typed_data';
 import 'package:image/image.dart' as img;
 
-Future<File> compress(File orgImg, int fileSize) async {
-  final imgSize = await orgImg.length();
+Future<Uint8List> compress(Uint8List orgImg, int fileSize) async {
+  final int imgSize = orgImg.length;
   final int quality = ((fileSize / imgSize) * 100).round().clamp(0, 100);
 
-  // Create a temporary file to store the compressed image
-  final Directory tempDir = Directory.systemTemp;
-  final String tempPath = '${tempDir.path}/compressed_${orgImg.uri.pathSegments.last}';
-  final File compressedFile = File(tempPath);
-
-  // Reading image for compression and cropping
-  final imageBytes = await orgImg.readAsBytes();
-  final decodedImage = img.decodeImage(imageBytes);
+  final decodedImage = img.decodeImage(orgImg);
   if (decodedImage == null) {
     throw Exception('Could not decode image.');
   }
@@ -28,9 +20,5 @@ Future<File> compress(File orgImg, int fileSize) async {
   img.Image croppedImage = img.copyCrop(decodedImage, x: xOffset, y: yOffset, width: cropWidth, height: cropHeight);
 
   // Compression
-  final Uint8List compressedBytes = Uint8List.fromList(img.encodeJpg(croppedImage, quality: quality));
-  await compressedFile.writeAsBytes(compressedBytes);
-
-  // Return the path to the compressed image
-  return compressedFile;
+  return Uint8List.fromList(img.encodeJpg(croppedImage, quality: quality));
 }

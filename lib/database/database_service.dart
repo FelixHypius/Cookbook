@@ -1,7 +1,7 @@
-import 'dart:io';
-
+import 'dart:typed_data';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:intl/intl.dart';
 
 class DatabaseService {
   final DatabaseReference _dbRef = FirebaseDatabase.instance.ref();
@@ -32,16 +32,6 @@ class DatabaseService {
       print('Data updated successfully at $path');
     } catch (error) {
       print('Error updating data: $error');
-    }
-  }
-
-  // Method to create new data
-  Future<void> create(String path, Map<String, dynamic> data) async {
-    try {
-      await _dbRef.child(path).set(data);
-      print('Data created successfully at $path');
-    } catch (error) {
-      print('Error creating data: $error');
     }
   }
 
@@ -88,6 +78,36 @@ class DatabaseService {
     return null;
   }
 
+  // Specific method to get matching title for section id
+  Future<String?> getSectionTitle(String id) async {
+    final sectionsSnap = await _dbRef.root.child('sections').get();
+    if (sectionsSnap.exists) {
+      final List<dynamic> sectionsList = sectionsSnap.value as List<dynamic>;
+      final List<dynamic> filteredSectionsList = sectionsList.where((element) => element != null).toList();
+      for (var section in filteredSectionsList) {
+        if (section != null && section['id'].toString() == id) {
+          return section['title'];
+        }
+      }
+    }
+    return null;
+  }
+
+  // Specific method to get sectionId from recipe by id
+  Future<int?> getSectionFromRecipe(int id) async {
+    final recipeSnap = await _dbRef.root.child('recipes').get();
+    if (recipeSnap.exists) {
+      final List<dynamic> recipeList = recipeSnap.value as List<dynamic>;
+      final List<dynamic> filteredRecipeList = recipeList.where((element) => element != null).toList();
+      for (var recipe in filteredRecipeList) {
+        if (recipe != null && recipe['id'] == id) {
+          return recipe['section'];
+        }
+      }
+    }
+    return null;
+  }
+
   // Specific method to get all recipes from one sectionId
   Future<List<Map<String, dynamic>>?> getRecipeList(int sectionId) async {
     try {
@@ -105,9 +125,10 @@ class DatabaseService {
   }
 
   // Specific method for uploading image
-  Future<String?> uploadImg(File file) async {
-    Reference ref = FirebaseStorage.instanceFor(bucket: 'gs://felix-s-cookbook.firebasestorage.app').ref().child('recipes/${await idRecipe}.jpg');
-    UploadTask uploadTask = ref.putFile(file);
+  Future<String?> uploadImg(Uint8List image, {required String category}) async {
+    // category is recipes or sections
+    Reference ref = FirebaseStorage.instanceFor(bucket: 'gs://felix-s-cookbook.firebasestorage.app').ref().child('$category/${await idRecipe}');
+    UploadTask uploadTask = ref.putData(image);
     TaskSnapshot snapshot = await uploadTask;
 
     if (snapshot.state == TaskState.success) {
@@ -128,6 +149,9 @@ class DatabaseService {
   }) async {
     final recipeID = await idRecipe;
     final sectionID = await getSectionId(sec);
+    DateTime now = DateTime.now();
+    DateFormat formatter = DateFormat('dd.MM.yyyy HH:mm:ss');
+    String timestamp = formatter.format(now);
     // Add new recipe
     Map<String, dynamic> recipe = {
       'id' : recipeID,
@@ -135,9 +159,10 @@ class DatabaseService {
       'imageUrl' : img,
       'title' : title,
       'ingredients' : ing,
-      'description' : description
+      'description' : description,
+      'uploaded' : timestamp
     };
-    create('recipes/$recipeID', recipe);
+    setBulk('recipes/$recipeID', recipe);
     // Increase id counter
     set('latestID', recipeID!+1);
     // Update section
@@ -159,9 +184,56 @@ class DatabaseService {
       'imageUrl' : img,
       'title' : title,
     };
-    create('sections/$sectionID', section);
+    setBulk('sections/$sectionID', section);
     // Increase id counter
     set('latestSection', sectionID!+1);
+  }
+
+  // Specific method for editing an old recipe.
+  Future<void> editRecipe({
+    required String title,
+    required String sec,
+    required List<Map<String,String>> ing,
+    required String img,
+    required String description,
+    required int recipeID
+  }) async {
+    final sectionIdFromRecipe = await getSectionFromRecipe(recipeID);
+    DateTime now = DateTime.now();
+    DateFormat formatter = DateFormat('dd.MM.yyyy HH:mm:ss');
+    String timestamp = formatter.format(now);
+    // Edit old recipe
+    Map<String, dynamic> recipe = {
+      'id' : recipeID,
+      'section' : sectionIdFromRecipe,
+      'imageUrl' : img,
+      'title' : title,
+      'ingredients' : ing,
+      'description' : description,
+      'uploaded' : timestamp
+    };
+    setBulk('recipes/$recipeID', recipe);
+    // Update section if section was changed!
+    final sectionIdFromTitle = await getSectionId(sec);
+    if (sectionIdFromTitle.toString() != sectionIdFromRecipe.toString()) {
+      // Add recipe to new section
+      final Object? recipeIdListNew = await get('sections/$sectionIdFromTitle/recipes');
+      List<int> currentIdList = [];
+      if (recipeIdListNew != null) {
+        currentIdList = List<int>.from(recipeIdListNew as List<dynamic>);
+      }
+      currentIdList.add(recipeID);
+      set('sections/$sectionIdFromTitle/recipes', currentIdList);
+
+      // Remove recipe from old section
+      final Object? recipeIdListOld = await get('sections/$sectionIdFromRecipe/recipes');
+      List<int> oldIdList = [];
+      if (recipeIdListOld != null) {
+        oldIdList = List<int>.from(recipeIdListNew as List<dynamic>);
+      }
+      oldIdList.add(recipeID);
+      set('sections/$sectionIdFromRecipe/recipes', oldIdList);
+    }
   }
 
   // Specific method to get all the section keys

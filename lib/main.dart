@@ -35,9 +35,6 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> _checkRememberStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    // REMOVE THIS LINE TO MAKE THE CODE WORK!
-    //await prefs.setBool('remember', false);
-    // THE LINE ABOVE THIS ONE!
     _remember = prefs.getBool('remember') ?? false;
   }
 

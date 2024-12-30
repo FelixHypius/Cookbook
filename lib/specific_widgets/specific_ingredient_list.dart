@@ -8,7 +8,8 @@ import '../util/input_checks.dart';
 import '../base_widgets/base_button.dart';
 
 class SpecIngredientList extends StatefulWidget {
-  const SpecIngredientList({super.key});
+  final List<dynamic>? ingredients;
+  const SpecIngredientList({super.key, this.ingredients});
 
   @override
   SpecIngredientListState createState() => SpecIngredientListState();
@@ -16,16 +17,39 @@ class SpecIngredientList extends StatefulWidget {
 
 class SpecIngredientListState extends State<SpecIngredientList> {
   InputCheck check = InputCheck();
-  List<Map<String, dynamic>> rows = [
-    {
-      'qtyC': TextEditingController(),
-      'ingC': TextEditingController(),
-      'qtyT': '',
-      'unitT': 'unit',
-      'ingT': '',
-      'editable': true
+  List<Map<String, dynamic>> rows = [];
+
+  @override
+  void initState(){
+    super.initState();
+    if (widget.ingredients != null) {
+      List<Map<String, dynamic>> entries = widget.ingredients!
+          .map((ingredient) => Map<String, dynamic>.from(ingredient as Map<Object?, dynamic>))
+          .toList();
+      for (var ingredient in entries) {
+        rows.add(
+          {
+            'qtyC': TextEditingController(text: ingredient['qtyT'].toString()),
+            'ingC': TextEditingController(text: ingredient['ingT']),
+            'qtyT': ingredient['qtyT'],
+            'unitT': ingredient['unitT'],
+            'ingT': ingredient['ingT'],
+            'editable': false
+          }
+        );
+      }
     }
-  ];
+    rows.add(
+      {
+        'qtyC': TextEditingController(),
+        'ingC': TextEditingController(),
+        'qtyT': '',
+        'unitT': 'unit',
+        'ingT': '',
+        'editable': true
+      }
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -88,7 +112,7 @@ class SpecIngredientListState extends State<SpecIngredientList> {
         ),
       ),
       Flexible(
-        flex: 10,
+        flex: 11,
         child: Padding(
           padding: const EdgeInsets.only(right: 10),
           child: BaseDropdownButton(
@@ -138,7 +162,7 @@ class SpecIngredientListState extends State<SpecIngredientList> {
           children: [
             Flexible(
               child: Text(
-                row['qtyT'],
+                row['qtyT'].toString(),
                 style: CustomTextStyle(size: 15, colour: MyColors.myWhite),
                 softWrap: true, // Enable line breaks
                 overflow: TextOverflow.visible,
@@ -190,7 +214,7 @@ class SpecIngredientListState extends State<SpecIngredientList> {
     setState(() {
       for (var row in rows) {
         counter++;
-        if (check.isNumeric(row['qtyC'].text) && check.isText(row['ingC'].text) && row['unitT']!='unit') {
+        if (check.isQty(row['qtyC'].text) && check.isText(row['ingC'].text) && row['unitT']!='unit') {
           row['qtyT'] = row['qtyC'].text;
           row['ingT'] = row['ingC'].text;
           if (row['editable']) {
@@ -198,10 +222,10 @@ class SpecIngredientListState extends State<SpecIngredientList> {
             row['ingC'].dispose();
             row['editable'] = false;
           }
-        } else if (!check.isNumeric(row['qtyC'].text)) {
+        } else if (!check.isQty(row['qtyC'].text)) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text("Please enter a valid quantity (>0) in row $counter."),
+              content: Text("Please enter a valid quantity in row $counter."),
             ),
           );
           saved = false;
@@ -231,7 +255,7 @@ class SpecIngredientListState extends State<SpecIngredientList> {
     setState(() {
       for (var row in rows) {
         counter++;
-        if (check.isNumeric(row['qtyC'].text) && check.isText(row['ingC'].text) && row['unitT']!='unit') {
+        if (check.isQty(row['qtyC'].text) && check.isText(row['ingC'].text) && row['unitT']!='unit') {
           row['qtyT'] = row['qtyC'].text;
           row['ingT'] = row['ingC'].text;
           if (row['editable']) {
@@ -239,7 +263,7 @@ class SpecIngredientListState extends State<SpecIngredientList> {
             row['ingC'].dispose();
             row['editable'] = false;
           }
-        } else if (!check.isNumeric(row['qtyC'].text)) {
+        } else if (!check.isQty(row['qtyC'].text)) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text("Please enter a valid quantity (>0) in row $counter."),

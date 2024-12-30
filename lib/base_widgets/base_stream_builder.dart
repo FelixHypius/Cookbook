@@ -17,10 +17,10 @@ class BaseStreamBuilder extends StreamBuilder {
         return Center(child: CircularProgressIndicator(strokeWidth: 2, color: MyColors.myBrightRed,));
       } else if (snapshot.hasError) {
         return Center(child: Text('Error: ${snapshot.error}'));
-      } else if (!snapshot.hasData || snapshot.data?.snapshot.value == null) {
+      } else if (!snapshot.hasData || snapshot.data?.value == null) {
         return Center(child: Text('Error: No data available.', style: CustomTextStyle(size: 15, colour: MyColors.myRed),));
       } else {
-        return buildd(context, snapshot.data!.snapshot.value);
+        return buildd(context, snapshot.data!.value);
       }
     }
   );

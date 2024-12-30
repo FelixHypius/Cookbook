@@ -36,6 +36,7 @@ class SectionPageState extends State<SectionPage> {
           initialSelectedIndex: 1,
         ),
         body: GestureDetector(
+          behavior: HitTestBehavior.translucent,
           onHorizontalDragEnd: (details) {
             if (details.primaryVelocity != null && details.primaryVelocity! > 0) {
               Navigator.pop(context);

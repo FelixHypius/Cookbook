@@ -97,6 +97,10 @@ class RegisterPageState extends State<RegisterPage> {
             email: email,
             password: password,
           );
+          /* firebase.auth().onAuthStateChanged(function(user) {
+             user.sendEmailVerification();
+             });
+          */
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => LoginPage()),

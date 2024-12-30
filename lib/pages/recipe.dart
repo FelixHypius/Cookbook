@@ -5,6 +5,7 @@ import 'package:cookbook/base_widgets/base_shade.dart';
 import 'package:cookbook/util/colors.dart';
 import 'package:cookbook/util/custom_text_style.dart';
 import 'package:flutter/material.dart';
+import '../base_widgets/base_button.dart';
 import '../base_widgets/base_scaffold.dart';
 import '../base_widgets/base_drawer.dart';
 import '../base_widgets/base_bottom_navigation_bar.dart';
@@ -124,12 +125,37 @@ class RecipePageState extends State<RecipePage> {
                       height: 5,
                     ),
                     Padding(
-                        padding: EdgeInsets.only(left: 5, right: 5, top: 15),
+                        padding: EdgeInsets.only(left: 5, right: 5, top: 15, bottom: 15),
                         child: Text(
                           recipeMap['description'].replaceAll(r'\n', '\n'),
                           style: CustomTextStyle(size: 15),
                         )
                     ),
+                    Divider(
+                      color: MyColors.myWhite,
+                      thickness: 2,
+                      height: 5,
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(left: 5, right: 5, top: 20),
+                      child: SizedBox(
+                        width: 70,
+                        height: 30,
+                        child: CustomButton(
+                          func: () {
+                            navigateToPage(context, 7, 5, recipeId: recipeMap['id']);
+                          },
+                          icon: Icon(Icons.save_rounded, size: 25, color: MyColors.myWhite,),
+                          text: Text('edit', style: CustomTextStyle(size: 15, tallness: 2), textAlign: TextAlign.center,),
+                          border: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(7.5)
+                          ),
+                          align: MainAxisAlignment.start,
+                          padding: EdgeInsets.only(left: 5),
+                          sizeSpace: 2,
+                        ),
+                      ),
+                    )
                   ],
                 );
               },

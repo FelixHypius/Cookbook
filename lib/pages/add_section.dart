@@ -65,9 +65,12 @@ class AddSectionPageState extends State<AddSectionPage> {
   }
 
   Future<String?> uploadImage() async {
-    if ((_imagePickerKey.currentState as SpecImagePickerState).image == null) return null;
+    final imagePickerState = _imagePickerKey.currentState;
+    if (imagePickerState?.image == null) return null;
+
     try {
-      return dbs.uploadImg(await comp.compress((_imagePickerKey.currentState as SpecImagePickerState).image!, 204800));
+      final compressedImage = await comp.compress(imagePickerState!.image!, 204800);
+      return dbs.uploadImg(compressedImage, category: "sections");
     } catch (e) {
       print('Error uploading image: ${e.toString()}');
       return null;
@@ -80,11 +83,11 @@ class AddSectionPageState extends State<AddSectionPage> {
       scaffoldKey: _scaffoldKey,
       drawer: BaseDrawer(
         scaffoldKey: _scaffoldKey,
-        currentIndex: 3,
+        currentIndex: 6,
       ),
       bottomnavigationbar: BaseBottomNavigationBar(
         initialSelectedIndex: 0,
-        currentIndex: 3,
+        currentIndex: 6,
         scaffoldKey: _scaffoldKey,
       ),
       body: SingleChildScrollView(
