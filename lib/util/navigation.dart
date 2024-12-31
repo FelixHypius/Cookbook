@@ -1,5 +1,4 @@
 import 'package:cookbook/pages/shoppinglist.dart';
-import 'package:image/image.dart';
 
 import '../pages/add_recipe.dart';
 import 'package:flutter/material.dart';

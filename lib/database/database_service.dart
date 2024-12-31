@@ -279,6 +279,7 @@ class DatabaseService {
     set('sections/$sectionId/imageUrl', img);
     set('sections/$sectionId/title', title);
     set('sections/$sectionId/owner', userId);
+    set('sections/$sectionId/uploaded', timestamp);
   }
 
   // Specific method to get all the section keys
