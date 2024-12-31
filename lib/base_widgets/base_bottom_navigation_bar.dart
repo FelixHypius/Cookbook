@@ -31,7 +31,6 @@ class BaseBottomNavigationBarState extends State<BaseBottomNavigationBar> {
     setState(() {
       _selectedIndex = index;
     });
-    print(widget.currentIndex);
     navigateToPage(context, index, widget.currentIndex, scaffoldState: widget.scaffoldKey.currentState);
   }
 
@@ -39,15 +38,15 @@ class BaseBottomNavigationBarState extends State<BaseBottomNavigationBar> {
   Widget build(BuildContext context) {
     return BottomNavigationBar(
       items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.menu_rounded), label: ""),
+        BottomNavigationBarItem(icon: Icon(Icons.menu_rounded, size: 28,), label: ""),
         BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: ""),
-        BottomNavigationBarItem(icon: Icon(Icons.settings), label: ""),
+        BottomNavigationBarItem(icon: Icon(Icons.shopping_bag_rounded), label: ""),
       ],
       showSelectedLabels: false,
       showUnselectedLabels: false,
       iconSize: 25,
-      backgroundColor: MyColors.myWhite,
-      unselectedItemColor: MyColors.myBlack,
+      backgroundColor: MyColors.myBlack,
+      unselectedItemColor: MyColors.myWhite,
       selectedItemColor: MyColors.myRed,
       onTap: _onItemTapped,
       currentIndex: _selectedIndex,

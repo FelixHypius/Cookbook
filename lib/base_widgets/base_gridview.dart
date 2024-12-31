@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../base_widgets/base_list_child.dart';
+import '../base_widgets/base_grid_child.dart';
 
 class BaseGridView extends StatefulWidget {
   final String searchQuery;
@@ -19,7 +19,7 @@ class BaseGridView extends StatefulWidget {
 
 class BaseGridViewState extends State<BaseGridView> {
 
-  List<BaseListChild> _filterList(String query, List<BaseListChild> list) {
+  List<BaseGridChild> _filterList(String query, List<BaseGridChild> list) {
     if (query.isEmpty) return list;
     return list.where((child) {
       return child.text.toLowerCase().contains(query.toLowerCase());
@@ -28,8 +28,8 @@ class BaseGridViewState extends State<BaseGridView> {
 
   @override
   Widget build(BuildContext context) {
-    final List<BaseListChild> listViewChildren = widget.values.map((value) {
-      return BaseListChild(
+    final List<BaseGridChild> listViewChildren = widget.values.map((value) {
+      return BaseGridChild(
         parent: widget.parent,
         text: value['title'],
         id: value['id'],

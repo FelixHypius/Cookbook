@@ -45,6 +45,7 @@ class SectionPageState extends State<SectionPage> {
           child: Column(
             children: [
               BaseInputField(
+                borderWidth: 0,
                 onChange: (query) {
                   setState(() {
                     _searchQuery = query.toLowerCase(); // Update the search query

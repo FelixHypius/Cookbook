@@ -1,4 +1,5 @@
 import 'package:cookbook/pages/home.dart';
+import 'package:cookbook/util/colors.dart';
 import 'package:flutter/material.dart';
 import 'pages/login.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -47,6 +48,10 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(
+        splashColor: MyColors.myBlack,
+        highlightColor: MyColors.myBlack
+      ),
       home: _showIntro
         ? IntroPage(onIntroComplete: _completeIntro)
         : (_remember ? const Homepage() : const LoginPage()),

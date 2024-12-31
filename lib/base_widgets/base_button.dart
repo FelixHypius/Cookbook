@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../util/colors.dart';
 
-class CustomButton extends OutlinedButton {
+class BaseButton extends OutlinedButton {
   final Function func;
   final Icon? icon;
   final OutlinedBorder? border;
@@ -11,7 +11,7 @@ class CustomButton extends OutlinedButton {
   final double? sizeSpace;
   final double? thickness;
 
-  CustomButton ({
+  BaseButton ({
     super.key,
     required this.func,
     this.icon,
@@ -27,6 +27,7 @@ class CustomButton extends OutlinedButton {
       shape: border ?? CircleBorder(),
       side: BorderSide(color: MyColors.myWhite, width: thickness??1),
       padding: EdgeInsets.zero,
+      minimumSize: Size.zero
     ),
     child: Padding(
       padding: padding ?? EdgeInsets.zero,

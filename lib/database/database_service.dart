@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:intl/intl.dart';
@@ -47,7 +48,7 @@ class DatabaseService {
 
   // Specific method to get latestRecipeID
   Future<int?> get idRecipe async {
-    final idSnap = await _dbRef.root.child('latestID').get();
+    final idSnap = await _dbRef.root.child('latestRecipeId').get();
     if (idSnap.exists) {
       return idSnap.value as int;
     }
@@ -56,9 +57,27 @@ class DatabaseService {
 
   // Specific method to get latestSectionID
   Future<int?> get idSection async {
-    final idSnap = await _dbRef.root.child('latestSection').get();
+    final idSnap = await _dbRef.root.child('latestSectionId').get();
     if (idSnap.exists) {
       return idSnap.value as int;
+    }
+    return null;
+  }
+
+  // Specific method to get owner of recipe
+  Future<String?> getRecipeOwner (int id) async {
+    final snap = await _dbRef.root.child('recipes/$id/owner').get();
+    if (snap.exists) {
+      return snap.value.toString();
+    }
+    return null;
+  }
+
+  // Specific method to get owner of recipe
+  Future<String?> getSectionsOwner (int id) async {
+    final snap = await _dbRef.root.child('sections/$id/owner').get();
+    if (snap.exists) {
+      return snap.value.toString();
     }
     return null;
   }
@@ -152,6 +171,8 @@ class DatabaseService {
     DateTime now = DateTime.now();
     DateFormat formatter = DateFormat('dd.MM.yyyy HH:mm:ss');
     String timestamp = formatter.format(now);
+    User? user = FirebaseAuth.instance.currentUser;
+    String userId = user?.uid ?? 'noUserId';
     // Add new recipe
     Map<String, dynamic> recipe = {
       'id' : recipeID,
@@ -160,7 +181,8 @@ class DatabaseService {
       'title' : title,
       'ingredients' : ing,
       'description' : description,
-      'uploaded' : timestamp
+      'uploaded' : timestamp,
+      'owner' : userId
     };
     setBulk('recipes/$recipeID', recipe);
     // Increase id counter
@@ -177,16 +199,19 @@ class DatabaseService {
 
   // Specific method for uploading a new section.
   Future<void> uploadSection({required String title, required String img}) async {
-    final sectionID = await idSection;
+    final sectionId = await idSection;
+    User? user = FirebaseAuth.instance.currentUser;
+    String userId = user?.uid ?? 'noUserId';
     // Add new recipe
     Map<String, dynamic> section = {
-      'id' : sectionID,
+      'id' : sectionId,
       'imageUrl' : img,
       'title' : title,
+      'owner' : userId,
     };
-    setBulk('sections/$sectionID', section);
+    setBulk('sections/$sectionId', section);
     // Increase id counter
-    set('latestSection', sectionID!+1);
+    set('latestSection', sectionId!+1);
   }
 
   // Specific method for editing an old recipe.
@@ -202,6 +227,8 @@ class DatabaseService {
     DateTime now = DateTime.now();
     DateFormat formatter = DateFormat('dd.MM.yyyy HH:mm:ss');
     String timestamp = formatter.format(now);
+    User? user = FirebaseAuth.instance.currentUser;
+    String userId = user?.uid ?? 'noUserId';
     // Edit old recipe
     Map<String, dynamic> recipe = {
       'id' : recipeID,
@@ -210,7 +237,8 @@ class DatabaseService {
       'title' : title,
       'ingredients' : ing,
       'description' : description,
-      'uploaded' : timestamp
+      'uploaded' : timestamp,
+      'owner' : userId
     };
     setBulk('recipes/$recipeID', recipe);
     // Update section if section was changed!
@@ -234,6 +262,23 @@ class DatabaseService {
       oldIdList.add(recipeID);
       set('sections/$sectionIdFromRecipe/recipes', oldIdList);
     }
+  }
+
+  // Specific method for editing an old section.
+  Future<void> editSection({
+    required String title,
+    required String img,
+    required int sectionId
+  }) async {
+    DateTime now = DateTime.now();
+    DateFormat formatter = DateFormat('dd.MM.yyyy HH:mm:ss');
+    String timestamp = formatter.format(now);
+    User? user = FirebaseAuth.instance.currentUser;
+    String userId = user?.uid ?? 'noUserId';
+    // Edit old section
+    set('sections/$sectionId/imageUrl', img);
+    set('sections/$sectionId/title', title);
+    set('sections/$sectionId/owner', userId);
   }
 
   // Specific method to get all the section keys

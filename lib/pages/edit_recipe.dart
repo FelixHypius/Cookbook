@@ -95,7 +95,7 @@ class EditRecipePageState extends State<EditRecipePage> {
           content: Text('Please select a valid recipe section.'),
         ),
       );
-    } else if ((_imagePickerKey.currentState as SpecImagePickerState).image == null || (_imagePickerKey.currentState as SpecImagePickerState).url == null) {
+    } else if ((_imagePickerKey.currentState as SpecImagePickerState).image == null && (_imagePickerKey.currentState as SpecImagePickerState).url == null) {
       setState(() {
         _isLoading = false;
       });
@@ -156,8 +156,12 @@ class EditRecipePageState extends State<EditRecipePage> {
           child: BaseFutureBuilder(
             func: dbs.get('recipes/${widget.recipeId.toString()}'),
             build: (context, recipeMap) {
-              _nameController.text = recipeMap['title'];
-              _recipeController.text = recipeMap['description'];
+              if(_nameController.text.isEmpty) {
+                _nameController.text = recipeMap['title'];
+              }
+              if(_recipeController.text.isEmpty) {
+                _recipeController.text = recipeMap['description'];
+              }
               return Stack(
                 children: [
                   Column(
@@ -239,7 +243,7 @@ class EditRecipePageState extends State<EditRecipePage> {
                         child: SizedBox(
                           width: 70,
                           height: 30,
-                          child: CustomButton(
+                          child: BaseButton(
                             func: _save,
                             icon: Icon(Icons.save_rounded, size: 25, color: MyColors.myWhite,),
                             text: Text('save', style: CustomTextStyle(size: 15, tallness: 2), textAlign: TextAlign.center,),
@@ -259,7 +263,7 @@ class EditRecipePageState extends State<EditRecipePage> {
                       child: Container(
                         color: MyColors.myBlack,
                         child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             CircularProgressIndicator(color: MyColors.myRed, strokeWidth: 5,),
                             Text('Waiting for recipe upload', style: CustomTextStyle(size: 20, colour: MyColors.myRed))

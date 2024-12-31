@@ -8,12 +8,12 @@ class BaseScaffold extends StatelessWidget {
   final Widget? bottomnavigationbar;
 
   const BaseScaffold({
-    Key? key,
+    super.key,
     required this.body,
     this.scaffoldKey,
     this.drawer,
     this.bottomnavigationbar,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +25,7 @@ class BaseScaffold extends StatelessWidget {
       drawerEnableOpenDragGesture: false,
       body: SafeArea(
         child: Padding(
-          padding: EdgeInsets.all(15),
+          padding: EdgeInsets.only(top: 10, right: 10, bottom: 5, left: 10),
           child: body,
         ),
       ),

@@ -67,7 +67,7 @@ class SpecImagePickerState extends State<SpecImagePicker> {
         SizedBox(
           height: 80,
           width: 80,
-          child: CustomButton(
+          child: BaseButton(
             func: getImageFromGallery,
             icon: Icon(Icons.add_rounded, size: 80, color: MyColors.myWhite,),
             thickness: 6,

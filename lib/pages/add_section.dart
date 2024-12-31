@@ -134,7 +134,7 @@ class AddSectionPageState extends State<AddSectionPage> {
                     child: SizedBox(
                       width: 70,
                       height: 30,
-                      child: CustomButton(
+                      child: BaseButton(
                         func: _save,
                         icon: Icon(Icons.save_rounded, size: 25, color: MyColors.myWhite,),
                         text: Text('save', style: CustomTextStyle(size: 15, tallness: 2), textAlign: TextAlign.center,),
@@ -154,7 +154,7 @@ class AddSectionPageState extends State<AddSectionPage> {
                   child: Container(
                     color: MyColors.myBlack,
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         CircularProgressIndicator(color: MyColors.myRed, strokeWidth: 5,),
                         Text('Waiting for section upload..', style: CustomTextStyle(size: 20, colour: MyColors.myRed))

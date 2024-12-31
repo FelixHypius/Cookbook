@@ -77,7 +77,7 @@ class SpecIngredientListState extends State<SpecIngredientList> {
           child: SizedBox(
             height: 30,
             width: 30,
-            child: CustomButton(
+            child: BaseButton(
               func: _addNewRow,
               icon: Icon(
                 Icons.add_rounded,
