@@ -8,27 +8,32 @@ class CustomPageRoute<T> extends PageRouteBuilder<T> {
       : super(
     pageBuilder: (context, animation, secondaryAnimation) => page,
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      const curve = Curves.easeInOut;
+      if (direction == 'none') {
+        return child;
+      } else {
 
-      // Define the appropriate tween based on the `homepage` parameter.
-      var tween = Tween<Offset>(
-        begin: (direction == 'horizontalL')
-            ? const Offset(-1.0, 0.0)
-            : (direction == 'horizontalR')
-            ? const Offset(1.0, 0.0)
-            : (direction == 'verticalT')
-            ? const Offset(0.0, -1.0)
-            : const Offset(0.0, 1.0),
-        end: const Offset(0.0, 0.0),
-      ).chain(CurveTween(curve: curve));
+        const curve = Curves.easeInOut;
 
-      var offsetAnimation = animation.drive(tween);
+        // Define the appropriate tween based on the `homepage` parameter.
+        var tween = Tween<Offset>(
+          begin: (direction == 'horizontalL')
+              ? const Offset(-1.0, 0.0)
+              : (direction == 'horizontalR')
+              ? const Offset(1.0, 0.0)
+              : (direction == 'verticalT')
+              ? const Offset(0.0, -1.0)
+              : const Offset(0.0, 1.0),
+          end: const Offset(0.0, 0.0),
+        ).chain(CurveTween(curve: curve));
 
-      return SlideTransition(
-        position: offsetAnimation,
-        child: child,
-      );
+        var offsetAnimation = animation.drive(tween);
+
+        return SlideTransition(
+          position: offsetAnimation,
+          child: child,
+        );
+      }
     },
-    transitionDuration: const Duration(milliseconds: 500),
+    transitionDuration: direction == 'none' ? Duration.zero : const Duration(milliseconds: 500),
   );
 }

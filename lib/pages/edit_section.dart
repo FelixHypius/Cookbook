@@ -1,6 +1,7 @@
 import 'package:cookbook/base_widgets/base_future_builder.dart';
 import 'package:cookbook/base_widgets/base_input_field.dart';
 import 'package:cookbook/util/colors.dart';
+import 'package:cookbook/util/custom_snackbar.dart';
 import 'package:cookbook/util/custom_text_style.dart';
 import 'package:cookbook/util/navigation.dart';
 import 'package:flutter/material.dart';
@@ -56,8 +57,8 @@ class EditSectionPageState extends State<EditSectionPage> {
           navigateToPage(context, 1, 9);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Your image could not be uploaded.'),
+              CustomSnackBar(
+                'Your image could not be uploaded.',
               )
           );
         }
@@ -74,8 +75,8 @@ class EditSectionPageState extends State<EditSectionPage> {
         _isLoading = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Please upload a picture for your recipe.'),
+        CustomSnackBar(
+            'Please upload a picture for your recipe.',
         ),
       );
     } else {
@@ -83,8 +84,8 @@ class EditSectionPageState extends State<EditSectionPage> {
         _isLoading = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Please enter a valid recipe title.'),
+        CustomSnackBar(
+            'Please enter a valid recipe title.',
         ),
       );
     }

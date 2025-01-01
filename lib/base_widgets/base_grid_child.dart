@@ -1,4 +1,6 @@
 import 'package:cookbook/base_widgets/base_shade.dart';
+import 'package:cookbook/database/local_database_service.dart';
+import 'package:cookbook/util/custom_snackbar.dart';
 import 'package:cookbook/util/custom_text_style.dart';
 import 'package:flutter/material.dart';
 import '../util/colors.dart';
@@ -19,6 +21,18 @@ class BaseGridChild extends GestureDetector{
     required this.contxt,
     required this.parent,
   }) : super (
+    onLongPress: () {
+      if (parent == 'recipes') {
+        final lDbs = LocalDatabaseService();
+        lDbs.addRecipeToSelectionList(id);
+        ScaffoldMessenger.of(contxt).showSnackBar(
+          CustomSnackBar(
+            'Recipe added to grocery list!',
+            time: 1200,
+          ),
+        );
+      }
+    },
     onTap: () {
       if (parent == 'sections') {
         navigateToPage(contxt, 4, 1, sectionId: id, direction: 'horizontalR');

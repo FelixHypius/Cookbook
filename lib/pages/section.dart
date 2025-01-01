@@ -1,7 +1,7 @@
 import 'package:cookbook/base_widgets/base_input_field.dart';
-import 'package:cookbook/database/database_service.dart';
+import 'package:cookbook/base_widgets/base_stream_builder.dart';
+import 'package:cookbook/database/data_sync_service.dart';
 import 'package:flutter/material.dart';
-import '../base_widgets/base_future_builder.dart';
 import '../base_widgets/base_scaffold.dart';
 import '../base_widgets/base_drawer.dart';
 import '../base_widgets/base_bottom_navigation_bar.dart';
@@ -20,7 +20,20 @@ class SectionPage extends StatefulWidget{
 class SectionPageState extends State<SectionPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   String _searchQuery = '';
-  final DatabaseService dbs = DatabaseService();
+  final dss = DataSyncService();
+
+  @override
+  void initState() {
+    super.initState();
+    dss.setSecId(widget.sectionId);
+    dss.fetchAndListenRecipes();
+  }
+
+  @override
+  void dispose() {
+    dss.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,13 +70,21 @@ class SectionPageState extends State<SectionPage> {
                 height: 15,
               ),
               Expanded(
-                  child: BaseFutureBuilder(
-                    func: dbs.getRecipeList(widget.sectionId),
-                    build: (context, recipeMapList) {
-                      if (recipeMapList == null || recipeMapList.isEmpty) return Center(child: Text('No recipes available.', style: CustomTextStyle(size: 15, colour: MyColors.myRed),));
-                      if (recipeMapList[0] == null) recipeMapList.remove(recipeMapList[0]);
+                  child: BaseStreamBuilder(
+                    streamm: dss.stream,
+                    buildd: (context, valueList) {
+                      if (valueList == null || valueList.isEmpty) {
+                        return Center(
+                          child: Text(
+                            'No sections available.',
+                            style: CustomTextStyle(size: 15, colour: MyColors.myRed),
+                          ),
+                        );
+                      }
+                      final List<dynamic> values = List<dynamic>.from(valueList);
+                      if (values[0] == null) values.remove(values[0]);
                       return BaseGridView(
-                        values: recipeMapList,
+                        values: valueList,
                         parent: 'recipes',
                         searchQuery: _searchQuery,
                       );

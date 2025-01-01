@@ -1,4 +1,5 @@
 import 'package:cookbook/base_widgets/base_input_field.dart';
+import 'package:cookbook/util/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import '../util/custom_text_style.dart';
 import '../util/colors.dart';
@@ -224,22 +225,22 @@ class SpecIngredientListState extends State<SpecIngredientList> {
           }
         } else if (!check.isQty(row['qtyC'].text)) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text("Please enter a valid quantity in row $counter."),
+            CustomSnackBar(
+              'Please enter a valid quantity in row $counter.'
             ),
           );
           saved = false;
         } else if (!check.isText(row['ingC'].text)) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text("Please enter a valid ingredient in row $counter."),
+            CustomSnackBar(
+              'Please enter a valid ingredient in row $counter.'
             ),
           );
           saved = false;
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text("Please enter a valid unit in row $counter."),
+            CustomSnackBar(
+              'Please enter a valid unit in row $counter.'
             ),
           );
           saved = false;
@@ -265,22 +266,22 @@ class SpecIngredientListState extends State<SpecIngredientList> {
           }
         } else if (!check.isQty(row['qtyC'].text)) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text("Please enter a valid quantity (>0) in row $counter."),
+            CustomSnackBar(
+              'Please enter a valid quantity (>0) in row $counter.'
             ),
           );
           addRow = false;
         } else if (!check.isText(row['ingC'].text)) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text("Please enter a valid ingredient in row $counter."),
+            CustomSnackBar(
+              'Please enter a valid ingredient in row $counter.'
             ),
           );
           addRow = false;
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text("Please enter a valid unit in row $counter."),
+            CustomSnackBar(
+              'Please enter a valid unit in row $counter.'
             ),
           );
           addRow = false;

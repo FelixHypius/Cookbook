@@ -21,7 +21,6 @@ class BaseDrawer extends StatelessWidget{
       Text('Add recipe', style: CustomTextStyle(size: 18, colour: MyColors.myWhite)),
       Text('Add section', style: CustomTextStyle(size: 18, colour: MyColors.myWhite)),
       Text('Edit section', style: CustomTextStyle(size: 18, colour: MyColors.myWhite)),
-      Text('Create list', style: CustomTextStyle(size: 18, colour: MyColors.myWhite)),
       Text('Settings', style: CustomTextStyle(size: 18, colour: MyColors.myGrey)),
     ];
 
@@ -90,12 +89,6 @@ class BaseDrawer extends StatelessWidget{
                 ),
                 ListTile(
                   title: textWidgets[3],
-                  onTap: (){
-                    navigateToPage(context, 2, currentIndex, scaffoldState: scaffoldKey.currentState);
-                  },
-                ),
-                ListTile(
-                  title: textWidgets[4],
                   onTap: (){
                     navigateToPage(context, 10, currentIndex, scaffoldState: scaffoldKey.currentState);
                   },

@@ -6,6 +6,7 @@ import '../base_widgets/base_scaffold.dart';
 import '../base_widgets/base_title.dart';
 import '../base_widgets/base_input_field.dart';
 import '../util/custom_button_style.dart';
+import '../util/custom_snackbar.dart';
 import 'login.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -113,17 +114,21 @@ class RegisterPageState extends State<RegisterPage> {
             message = "The password provided is too weak.";
           }
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(message)),
+            CustomSnackBar(message),
           );
         }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Passwords do not match.")),
+          CustomSnackBar(
+            'Passwords do not match.'
+          ),
         );
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("All fields are required.")),
+        CustomSnackBar(
+          'All fields are required.'
+        ),
       );
     }
   }

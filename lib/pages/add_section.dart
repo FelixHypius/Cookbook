@@ -1,5 +1,6 @@
 import 'package:cookbook/base_widgets/base_input_field.dart';
 import 'package:cookbook/util/colors.dart';
+import 'package:cookbook/util/custom_snackbar.dart';
 import 'package:cookbook/util/custom_text_style.dart';
 import 'package:cookbook/util/navigation.dart';
 import 'package:flutter/material.dart';
@@ -44,21 +45,21 @@ class AddSectionPageState extends State<AddSectionPage> {
         navigateToPage(context, 1, 6);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Your image could not be uploaded.'),
+            CustomSnackBar(
+                'Your image could not be uploaded.'
             )
         );
       }
     } else if ((_imagePickerKey.currentState as SpecImagePickerState).image == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Please upload a picture for your recipe.'),
+        CustomSnackBar(
+            'Please upload a picture for your recipe.'
         ),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Please enter a valid section title.'),
+        CustomSnackBar(
+            'Please enter a valid section title.'
         ),
       );
     }

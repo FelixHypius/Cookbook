@@ -64,6 +64,15 @@ class DatabaseService {
     return null;
   }
 
+  // Specific method to get latest update timestamp.
+  Future<String?> get latestUpdateTime async {
+    final snap = await _dbRef.root.child('latestUpdate').get();
+    if (snap.exists) {
+      return snap.value.toString();
+    }
+    return null;
+  }
+
   // Specific method to get owner of recipe
   Future<String?> getRecipeOwner (int id) async {
     final snap = await _dbRef.root.child('recipes/$id/owner').get();
@@ -143,6 +152,24 @@ class DatabaseService {
     }
   }
 
+  // Specific method to get all sections
+  Future<DataSnapshot?> get sectionList async{
+    final snapshot = await _dbRef.root.child('sections').get();
+    if (snapshot.exists) {
+      return snapshot; // Initial fetch
+    }
+    return null;
+  }
+
+  // Specific method to get all recipes
+  Future<DataSnapshot?> get recipeList async{
+    final snapshot = await _dbRef.root.child('recipes').get();
+    if (snapshot.exists) {
+      return snapshot; // Initial fetch
+    }
+    return null;
+  }
+
   // Specific method for uploading image
   Future<String?> uploadImg(Uint8List image, {required String category}) async {
     // category is recipes or sections
@@ -186,7 +213,7 @@ class DatabaseService {
     };
     setBulk('recipes/$recipeID', recipe);
     // Increase id counter
-    set('latestID', recipeID!+1);
+    set('latestRecipeId', recipeID!+1);
     // Update section
     final Object? value = await get('sections/$sectionID/recipes');
     List<int> currentIdList = [];
@@ -195,6 +222,8 @@ class DatabaseService {
     }
     currentIdList.add(recipeID);
     set('sections/$sectionID/recipes', currentIdList);
+    // Change update timestamp
+    set('latestUpdate', timestamp);
   }
 
   // Specific method for uploading a new section.
@@ -211,7 +240,12 @@ class DatabaseService {
     };
     setBulk('sections/$sectionId', section);
     // Increase id counter
-    set('latestSection', sectionId!+1);
+    set('latestSectionId', sectionId!+1);
+    // Change update timestamp
+    DateTime now = DateTime.now();
+    DateFormat formatter = DateFormat('dd.MM.yyyy HH:mm:ss');
+    String timestamp = formatter.format(now);
+    set('latestUpdate', timestamp);
   }
 
   // Specific method for editing an old recipe.
@@ -262,6 +296,8 @@ class DatabaseService {
       oldIdList.add(recipeID);
       set('sections/$sectionIdFromRecipe/recipes', oldIdList);
     }
+    // Change upload timestamp.
+    set('latestUpdate', timestamp);
   }
 
   // Specific method for editing an old section.
@@ -280,6 +316,8 @@ class DatabaseService {
     set('sections/$sectionId/title', title);
     set('sections/$sectionId/owner', userId);
     set('sections/$sectionId/uploaded', timestamp);
+    // Change update timestamp.
+    set('latestUpdate', timestamp);
   }
 
   // Specific method to get all the section keys

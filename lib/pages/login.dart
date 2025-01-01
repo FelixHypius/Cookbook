@@ -1,5 +1,6 @@
 import 'package:cookbook/pages/register.dart';
 import 'package:cookbook/util/colors.dart';
+import 'package:cookbook/util/custom_snackbar.dart';
 import 'package:cookbook/util/custom_text_style.dart';
 import 'package:flutter/material.dart';
 import '../base_widgets/base_scaffold.dart';
@@ -152,8 +153,8 @@ class LoginPageState extends State<LoginPage> {
 
       if (email.isEmpty || password.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("I don't remember you 😥. Please login using your credentials."),
+          CustomSnackBar(
+            "I don't remember you 😥. Please login using your credentials."
           ),
         );
       } else {
@@ -176,21 +177,29 @@ class LoginPageState extends State<LoginPage> {
           } on FirebaseAuthException catch (e) {
             if (e.code == "user-not-found") {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("No user found for that email.")),
+                CustomSnackBar(
+                  'No user found for that email.'
+                ),
               );
             } else if (e.code == "wrong-password") {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Incorrect password.")),
+                CustomSnackBar(
+                  'Incorrect password.'
+                ),
               );
             } else if (e.code == "invalid-credential") {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text("Invalid credentials, please reset password!")),
+                CustomSnackBar(
+                  'Invalid credentials.'
+                )
               );
             }
           }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Invalid email.")),
+            CustomSnackBar(
+              'Invalid email.'
+            ),
           );
         }
       }
@@ -202,22 +211,30 @@ class LoginPageState extends State<LoginPage> {
 
     if (email.isEmpty || !EmailValidator.validate(email)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please enter a valid email address.")),
+        CustomSnackBar(
+          'Please enter a valid email address.'
+        ),
       );
     } else {
       try {
         await _auth.sendPasswordResetEmail(email: email);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Password reset email sent!")),
+          CustomSnackBar(
+            'Password reset email sent!'
+          ),
         );
       } on FirebaseAuthException catch (e) {
         if (e.code == "user-not-found") {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("No user found for that email.")),
+            CustomSnackBar(
+              'No user found for that email.'
+            ),
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Error: ${e.message}")),
+            CustomSnackBar(
+              'Error: ${e.message}'
+            ),
           );
         }
       }

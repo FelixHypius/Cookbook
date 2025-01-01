@@ -10,6 +10,7 @@ class BaseButton extends OutlinedButton {
   final EdgeInsetsGeometry? padding;
   final double? sizeSpace;
   final double? thickness;
+  final MainAxisSize? length;
 
   BaseButton ({
     super.key,
@@ -21,6 +22,7 @@ class BaseButton extends OutlinedButton {
     this.padding,
     this.sizeSpace,
     this.thickness,
+    this.length
   }) : super (
     onPressed: ()  => func(),
     style: OutlinedButton.styleFrom(
@@ -32,6 +34,7 @@ class BaseButton extends OutlinedButton {
     child: Padding(
       padding: padding ?? EdgeInsets.zero,
       child: Row(
+        mainAxisSize: length??MainAxisSize.max,
         mainAxisAlignment: align ?? MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [

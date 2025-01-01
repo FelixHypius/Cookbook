@@ -1,7 +1,5 @@
-import 'dart:async';
-
 import 'package:cookbook/base_widgets/base_input_field.dart';
-import 'package:firebase_database/firebase_database.dart';
+import 'package:cookbook/database/data_sync_service.dart';
 import 'package:flutter/material.dart';
 import '../base_widgets/base_scaffold.dart';
 import '../base_widgets/base_drawer.dart';
@@ -21,39 +19,18 @@ class Homepage extends StatefulWidget {
 class HomepageState extends State<Homepage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   String _searchQuery = '';
-  late StreamController<DataSnapshot> _controller;
-  late Stream<DataSnapshot> _stream;
+  final dss = DataSyncService();
 
   @override
   void initState() {
     super.initState();
-    _controller = StreamController<DataSnapshot>();
-    _stream = _controller.stream;
-    _fetchAndListen();
+    dss.fetchAndListenSections();
   }
 
   @override
   void dispose() {
-    _controller.close();
+    dss.dispose();
     super.dispose();
-  }
-
-  Future<void> _fetchAndListen() async {
-    final ref = FirebaseDatabase.instance.ref().child('sections');
-
-    // Emit the initial data
-    try {
-      final snapshot = await ref.get();
-      if (snapshot.exists) {
-        _controller.add(snapshot);  // Initial fetch
-      }
-      // Start listening to changes
-      ref.onValue.listen((event) {
-        _controller.add(event.snapshot); // Updates after the initial fetch
-      });
-    } catch (error) {
-      _controller.addError(error);
-    }
   }
 
   @override
@@ -86,7 +63,7 @@ class HomepageState extends State<Homepage> {
           ),
           Expanded(
             child: BaseStreamBuilder(
-              streamm: _stream, // Use the stream initialized in initState
+              streamm: dss.stream,
               buildd: (context, valueList) {
                 if (valueList == null || valueList.isEmpty) {
                   return Center(
