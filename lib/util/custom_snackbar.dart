@@ -3,8 +3,8 @@ import 'package:cookbook/util/custom_text_style.dart';
 import 'package:flutter/material.dart';
 
 class CustomSnackBar extends SnackBar{
-  String text;
-  int? time;
+  final String text;
+  final int? time;
 
   CustomSnackBar(this.text, {super.key, this.time}) : super(
     content: Text(

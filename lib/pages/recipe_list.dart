@@ -8,7 +8,6 @@ import '../base_widgets/base_scaffold.dart';
 import '../base_widgets/base_stream_builder.dart';
 import '../util/colors.dart';
 import '../util/custom_text_style.dart';
-import '../util/item.dart';
 
 class RecipeList extends StatefulWidget {
   const RecipeList({super.key});
