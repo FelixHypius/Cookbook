@@ -2,6 +2,7 @@ import 'package:cookbook/util/colors.dart';
 import 'package:cookbook/util/custom_text_style.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../base_widgets/base_button.dart';
 import '../base_widgets/base_scaffold.dart';
 import '../base_widgets/base_title.dart';
 import '../base_widgets/base_input_field.dart';
@@ -28,61 +29,80 @@ class RegisterPageState extends State<RegisterPage> {
     final screenWidth = MediaQuery.of(context).size.width;
 
     return BaseScaffold(
-      body: ListView(
-        children: [
-          BaseTitle(
-            text: "Register",
-            screenWidth: screenWidth,
-            screenHeight: screenHeight,
-          ),
-          Container(
-            height: screenHeight * 0.1,
-          ),
-          Padding(
-            padding: EdgeInsets.all(15),
-            child: BaseInputField(
-              icon: Icons.email_outlined,
-              hintText: "Enter email..",
-              control: _emailController,
+      body: SingleChildScrollView(
+        physics: AlwaysScrollableScrollPhysics(),
+        child: Column(
+          children: [
+            BaseTitle(
+              text: "Register",
+              screenWidth: screenWidth,
+              screenHeight: screenHeight,
             ),
-          ),
-          Padding(
-            padding: EdgeInsets.all(15),
-            child: BaseInputField(
-              icon: Icons.key_outlined,
-              hintText: "Enter password..",
-              control: _passwordController,
-              obscure: true,
-              maxRows: 1,
+            Container(
+              height: screenHeight * 0.1,
             ),
-          ),
-          Padding(
-            padding: EdgeInsets.all(15),
-            child: BaseInputField(
-              icon: Icons.key_outlined,
-              hintText: "Re-enter password..",
-              control: _repeatPasswordController,
-              obscure: true,
-              maxRows: 1,
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.only(
-                top: 15, bottom: 15, left: screenWidth * 0.3, right: screenWidth * 0.3),
-            child: OutlinedButton(
-              onPressed: register,
-              style: CustomButtonStyle(
-                backColor: MyColors.myWhite,
-                borderColor: MyColors.myGrey,
-              ),
-              child: Text(
-                "Register!",
-                style: CustomTextStyle(size: 15, colour: MyColors.myBlack),
+            Padding(
+              padding: EdgeInsets.all(10),
+              child: BaseInputField(
+                icon: Icons.email_outlined,
+                hintText: "Enter email..",
+                control: _emailController,
+                normalColour: MyColors.myWhite,
+                fillColour: MyColors.myBlack,
+                textColour: MyColors.myWhite,
+                iconColour: MyColors.myWhite,
+                focusedColour: MyColors.myBrightRed,
+                hintColour: MyColors.myBrightGrey,
               ),
             ),
-          ),
-        ],
-      ),
+            Padding(
+              padding: EdgeInsets.all(10),
+              child: BaseInputField(
+                icon: Icons.key_outlined,
+                hintText: "Enter password..",
+                control: _passwordController,
+                obscure: true,
+                maxRows: 1,
+                normalColour: MyColors.myWhite,
+                fillColour: MyColors.myBlack,
+                textColour: MyColors.myWhite,
+                iconColour: MyColors.myWhite,
+                focusedColour: MyColors.myBrightRed,
+                hintColour: MyColors.myBrightGrey,
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(10),
+              child: BaseInputField(
+                icon: Icons.key_outlined,
+                hintText: "Re-enter password..",
+                control: _repeatPasswordController,
+                obscure: true,
+                maxRows: 1,
+                normalColour: MyColors.myWhite,
+                fillColour: MyColors.myBlack,
+                textColour: MyColors.myWhite,
+                iconColour: MyColors.myWhite,
+                focusedColour: MyColors.myBrightRed,
+                hintColour: MyColors.myBrightGrey,
+              ),
+            ),
+            SizedBox(
+              height: screenHeight*0.05,
+            ),
+            BaseButton(
+              func: register,
+              text: Text('Register!', style: CustomTextStyle(size: 15, tallness: 2), textAlign: TextAlign.center,),
+              border: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(7.5)
+              ),
+              align: MainAxisAlignment.center,
+              length: MainAxisSize.min,
+              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 40),
+            ),
+          ],
+        ),
+      )
     );
   }
 

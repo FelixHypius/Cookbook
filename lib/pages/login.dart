@@ -4,6 +4,7 @@ import 'package:cookbook/util/colors.dart';
 import 'package:cookbook/util/custom_snackbar.dart';
 import 'package:cookbook/util/custom_text_style.dart';
 import 'package:flutter/material.dart';
+import '../base_widgets/base_button.dart';
 import '../base_widgets/base_scaffold.dart';
 import '../base_widgets/base_title.dart';
 import '../base_widgets/base_input_field.dart';
@@ -34,108 +35,147 @@ class LoginPageState extends State<LoginPage> {
     final screenWidth = MediaQuery.of(context).size.width;
 
     return BaseScaffold(
-      body: ListView(
-        children: [
-          BaseTitle(
-            text: "Log in",
-            screenWidth: screenWidth,
-            screenHeight: screenHeight,
-          ),
-          Container(
-            height: screenHeight * 0.1,
-          ),
-          Padding(
-            padding: EdgeInsets.only(top: 10, bottom: 10),
-            child: BaseInputField(
-              icon: Icons.account_circle_outlined,
-              hintText: "Enter email..",
-              control: _emailController,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            BaseTitle(
+              text: "Log in",
+              screenWidth: screenWidth,
+              screenHeight: screenHeight,
             ),
-          ),
-          Padding(
-            padding: EdgeInsets.only(top: 10, bottom: 10),
-            child: BaseInputField(
-              icon: Icons.key_outlined,
-              hintText: "Enter password..",
-              control: _passwordController,
-              obscure: true,
-              maxRows: 1,
+            SizedBox(
+              height: screenHeight * 0.1,
             ),
-          ),
-          Row(
-            children: [
-              Checkbox(
-                side: BorderSide(
-                  color: MyColors.myWhite,
-                  width: 3,
-                ),
-                checkColor: MyColors.myWhite,
-                activeColor: MyColors.myRed,
-                value: checked,
-                onChanged: (bool? value) {
-                  setState(() {
-                    checked = value ?? false;
-                  });
-                },
-              ),
-              Text(
-                'Remember me, please.. 🥹',
-                style: CustomTextStyle(
-                  size: 12.5,
-                ),
-              ),
-            ],
-          ),
-          Padding(
-            padding: EdgeInsets.only(top: 30, bottom: 15, left: screenWidth * 0.25, right: screenWidth * 0.25),
-            child: OutlinedButton(
-              onPressed: login,
-              style: CustomButtonStyle(backColor: MyColors.myWhite, borderColor: MyColors.myGrey),
-              child: Text(
-                "Log in!",
-                style: CustomTextStyle(size: 15, colour: MyColors.myBlack),
+            Padding(
+              padding: EdgeInsets.all(10),
+              child: BaseInputField(
+                icon: Icons.account_circle_outlined,
+                hintText: "Enter email..",
+                control: _emailController,
+                normalColour: MyColors.myWhite,
+                fillColour: MyColors.myBlack,
+                textColour: MyColors.myWhite,
+                iconColour: MyColors.myWhite,
+                focusedColour: MyColors.myBrightRed,
+                hintColour: MyColors.myBrightGrey,
               ),
             ),
-          ),
-          Container(
-            height: screenHeight * 0.1,
-          ),
-          Center(
-            child: RichText(
-              text: TextSpan(
-                text: 'If this is your first time cooking, please ',
-                style: CustomTextStyle(
-                  size: 12.5,
-                ),
-                children: [
-                  TextSpan(
-                    text: 'register!',
-                    style: CustomTextStyle(
-                      size: 12.5,
-                      underlined: true,
+            Padding(
+              padding: EdgeInsets.all(10),
+              child: BaseInputField(
+                icon: Icons.key_outlined,
+                hintText: "Enter password..",
+                control: _passwordController,
+                obscure: true,
+                maxRows: 1,
+                normalColour: MyColors.myWhite,
+                fillColour: MyColors.myBlack,
+                textColour: MyColors.myWhite,
+                iconColour: MyColors.myWhite,
+                focusedColour: MyColors.myBrightRed,
+                hintColour: MyColors.myBrightGrey,
+              ),
+            ),
+            Row(
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(left: 10),
+                  child: Checkbox(
+                    side: BorderSide(
+                      color: MyColors.myWhite,
+                      width: 2,
                     ),
-                    recognizer: TapGestureRecognizer()
-                      ..onTap = () => Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => RegisterPage()),
-                      ),
+                    checkColor: MyColors.myWhite,
+                    activeColor: MyColors.myRed,
+                    value: checked,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    onChanged: (bool? value) {
+                      setState(() {
+                        checked = value ?? false;
+                      });
+                    },
                   ),
-                ],
+                ),
+                Text(
+                  'Remember me',
+                  style: CustomTextStyle(
+                    size: 14,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(
+              height: screenHeight*0.035,
+            ),
+            BaseButton(
+              func: login,
+              text: Text('Log in!', style: CustomTextStyle(size: 15, tallness: 2), textAlign: TextAlign.center,),
+              border: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(7.5)
+              ),
+              align: MainAxisAlignment.center,
+              length: MainAxisSize.min,
+              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 40),
+            ),
+            SizedBox(
+              height: screenHeight * 0.15,
+            ),
+            Center(
+              child: RichText(
+                text: TextSpan(
+                  text: 'Is this your first time cooking? Please ',
+                  style: CustomTextStyle(
+                    size: 12,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: 'register!',
+                      style: CustomTextStyle(
+                        size: 12,
+                        underlined: true,
+                      ),
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () => Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => RegisterPage()),
+                        ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-          // Forgot Password Section
-          Center(
-            child: TextButton(
-              onPressed: resetPassword,  // Trigger password reset
-              child: Text(
-                "Forgot Password?",
-                style: CustomTextStyle(size: 12.5, underlined: true),
+            SizedBox(
+              height: 15,
+            ),
+            Center(
+              child: RichText(
+                text: TextSpan(
+                  text: 'Forgot your password? Click ',
+                  style: CustomTextStyle(
+                    size: 12,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: 'here!',
+                      style: CustomTextStyle(
+                        size: 12,
+                        underlined: true,
+                      ),
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () => resetPassword
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
-      ),
+            SizedBox(
+              height: screenHeight*0.05,
+            )
+          ],
+        ),
+      )
     );
   }
 
