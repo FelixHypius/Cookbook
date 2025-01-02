@@ -1,4 +1,5 @@
 import 'package:cookbook/pages/register.dart';
+import 'package:cookbook/pages/updates_info.dart';
 import 'package:cookbook/util/colors.dart';
 import 'package:cookbook/util/custom_snackbar.dart';
 import 'package:cookbook/util/custom_text_style.dart';
@@ -172,7 +173,7 @@ class LoginPageState extends State<LoginPage> {
 
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => const Homepage()),
+              MaterialPageRoute(builder: (context) => UpdatesInfo()),
             );
           } on FirebaseAuthException catch (e) {
             if (e.code == "user-not-found") {

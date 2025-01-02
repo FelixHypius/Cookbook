@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:cookbook/util/colors.dart';
 import 'package:cookbook/util/custom_text_style.dart';
+import 'package:cookbook/util/patch_notes.dart';
 import 'package:flutter/material.dart';
 import '../util/navigation.dart';
 
@@ -9,11 +10,13 @@ class BaseDrawer extends StatelessWidget{
   final GlobalKey<ScaffoldState> scaffoldKey;
   final int currentIndex;
 
-  const BaseDrawer({
+  BaseDrawer({
     super.key,
     required this.scaffoldKey,
     required this.currentIndex,
   });
+
+  final patch = PatchNotes();
 
   @override
   Widget build(BuildContext context) {
@@ -99,7 +102,7 @@ class BaseDrawer extends StatelessWidget{
           Padding(
             padding: EdgeInsets.only(bottom: 8, left: 8),
             child: Text(
-              'Version 1.1.3',
+              patch.version,
               style: CustomTextStyle(size: 10, colour: MyColors.myGrey,),
             ),
           )

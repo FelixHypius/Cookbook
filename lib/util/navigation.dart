@@ -41,7 +41,8 @@ void navigateToPage(
     case 2:
     // Navigate to shopping list page
       scaffoldState?.closeDrawer();
-      Navigator.of(context).pushReplacement(CustomPageRoute(page: RecipeList(), direction: direction??'none'));
+      /// Functionality disabled.
+      //Navigator.of(context).pushReplacement(CustomPageRoute(page: RecipeList(), direction: direction??'none'));
       break;
     case 3:
     // Navigate to Add recipe page

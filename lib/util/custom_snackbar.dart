@@ -11,7 +11,7 @@ class CustomSnackBar extends SnackBar{
       text,
       style: CustomTextStyle(size: 12),
     ),
-    duration: Duration(milliseconds: time??200),
+    duration: Duration(milliseconds: time??1200),
     backgroundColor: MyColors.myDarkGrey
   );
 

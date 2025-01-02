@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:intl/intl.dart';
 import 'local_database_service.dart';
 import 'database_service.dart';
@@ -32,86 +33,93 @@ class DataSyncService {
 
   Future<void> fetchAndListenSections() async {
     // Check if there is local data available.
-    final latestLocal = await localDatabaseService.getTimeStamp();
-    final latestOnline = await databaseService.latestUpdateTime;
-    bool needSync = false;
+    final DatabaseReference ref = FirebaseDatabase.instance.ref();
+    ref.root.child('latestUpdate').onValue.listen((event) async {
+      final latestOnline = event.snapshot.value.toString();
+      final latestLocal = await localDatabaseService.getTimeStamp();
+      bool needSync = false;
 
-    if (latestLocal != null) {
-      final DateTime local = format.parse(latestLocal);
-      final DateTime online = parseDateTime(latestOnline);
-      // Check if database timestamp is younger than local timestamp.
-      if (online.isAfter(local)) {
-        needSync = true; // Sync required
+      if (latestLocal != null) {
+        final DateTime local = format.parse(latestLocal);
+        final DateTime online = parseDateTime(latestOnline);
+        // Check if database timestamp is younger than local timestamp.
+        if (online.isAfter(local)) {
+          needSync = true; // Sync required
+        } else {
+          _controller.add(await localDatabaseService.getSectionsData());
+        }
       } else {
-        _controller.add(await localDatabaseService.getSectionsData());
+        needSync = true; // Sync required if no local data
       }
-    } else {
-      needSync = true; // Sync required if no local data
-    }
 
-    if (needSync) {
-      try {
-        // Fetch data
-        final sectionSnap = await databaseService.sectionList;
-        final recipeSnap = await databaseService.recipeList;
-        // Save data
-        if (sectionSnap != null) {
-          await localDatabaseService.setSectionsData(sectionSnap, latestOnline ?? DateTime.now().toString());
+      if (needSync) {
+        try {
+          // Fetch data
+          final sectionSnap = await databaseService.sectionList;
+          final recipeSnap = await databaseService.recipeList;
+          // Save data
+          if (sectionSnap != null) {
+            await localDatabaseService.setSectionsData(sectionSnap, latestOnline);
+          }
+          if (recipeSnap != null) {
+            await localDatabaseService.setRecipesData(recipeSnap, latestOnline);
+          }
+          // Stream data
+          List<dynamic>? data = sectionSnap != null ? sectionSnap.value as List<dynamic> : null;
+          _controller.add(data);
+        } catch (e) {
+          _controller.addError(e);
         }
-        if (recipeSnap != null) {
-          await localDatabaseService.setRecipesData(recipeSnap, latestOnline ?? DateTime.now().toString());
-        }
-        // Stream data
-        List<dynamic>? data = sectionSnap != null ? sectionSnap.value as List<dynamic> : null;
-        _controller.add(data);
-      } catch (e) {
-        _controller.addError(e);
       }
-    }
+    });
+
   }
 
   Future<void> fetchAndListenRecipes() async {
-    // Check if there is local data available.
-    final latestLocal = await localDatabaseService.getTimeStamp();
-    final latestOnline = await databaseService.latestUpdateTime;
-    bool needSync = false;
+    final DatabaseReference ref = FirebaseDatabase.instance.ref();
+    ref.root.child('latestUpdate').onValue.listen((event) async {
+      final latestOnline = event.snapshot.value.toString();
+      // Check if there is local data available.
+      final latestLocal = await localDatabaseService.getTimeStamp();
+      bool needSync = false;
 
-    if (latestLocal != null) {
-      final DateTime local = format.parse(latestLocal);
-      final DateTime online = parseDateTime(latestOnline);
-      // Check if database timestamp is younger than local timestamp.
-      if (online.isAfter(local)) {
-        needSync = true; // Sync required
+      if (latestLocal != null) {
+        final DateTime local = format.parse(latestLocal);
+        final DateTime online = parseDateTime(latestOnline);
+        // Check if database timestamp is younger than local timestamp.
+        if (online.isAfter(local)) {
+          needSync = true; // Sync required
+        } else {
+          _controller.add(await localDatabaseService.getRecipesDataBySection(secId));
+        }
       } else {
-        _controller.add(await localDatabaseService.getRecipesDataBySection(secId));
+        needSync = true; // Sync required if no local data
       }
-    } else {
-      needSync = true; // Sync required if no local data
-    }
 
-    if (needSync) {
-      try {
-        // Fetch data
-        final sectionSnap = await databaseService.sectionList;
-        final recipeSnap = await databaseService.recipeList;
-        // Save data
-        if (sectionSnap != null) {
-          await localDatabaseService.setSectionsData(sectionSnap, latestOnline ?? DateTime.now().toString());
+      if (needSync) {
+        try {
+          // Fetch data
+          final sectionSnap = await databaseService.sectionList;
+          final recipeSnap = await databaseService.recipeList;
+          // Save data
+          if (sectionSnap != null) {
+            await localDatabaseService.setSectionsData(sectionSnap, latestOnline);
+          }
+          if (recipeSnap != null) {
+            await localDatabaseService.setRecipesData(recipeSnap, latestOnline);
+          }
+          // Stream data
+          List<dynamic>? data;
+          if (recipeSnap != null) {
+            data = recipeSnap.value as List<dynamic>;
+            data = data.where((recipe) => recipe['section'] == secId).toList();
+          }
+          _controller.add(data);
+        } catch (e) {
+          _controller.addError(e);
         }
-        if (recipeSnap != null) {
-          await localDatabaseService.setRecipesData(recipeSnap, latestOnline ?? DateTime.now().toString());
-        }
-        // Stream data
-        List<dynamic>? data;
-        if (recipeSnap != null) {
-          data = recipeSnap.value as List<dynamic>;
-          data = data.where((recipe) => recipe['section'] == secId).toList();
-        }
-        _controller.add(data);
-      } catch (e) {
-        _controller.addError(e);
       }
-    }
+    });
   }
 
   Future<void> fetchAndListenRecipeList() async {
