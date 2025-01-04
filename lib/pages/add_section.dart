@@ -56,7 +56,7 @@ class AddSectionPageState extends State<AddSectionPage> {
         CustomPageRoute(
             page: BaseLoadingPage(
               context: context,
-              kind: 'recipe',
+              kind: 'section',
               imageUrl: imageUrl,
               imageList: imageList,
               title: title,
