@@ -46,7 +46,9 @@ class DataSyncService {
         if (online.isAfter(local)) {
           needSync = true; // Sync required
         } else {
-          _controller.add(await localDatabaseService.getSectionsData());
+          if (!_controller.isClosed) {
+            _controller.add(await localDatabaseService.getSectionsData());
+          }
         }
       } else {
         needSync = true; // Sync required if no local data
@@ -66,9 +68,13 @@ class DataSyncService {
           }
           // Stream data
           List<dynamic>? data = sectionSnap != null ? sectionSnap.value as List<dynamic> : null;
-          _controller.add(data);
+          if (!_controller.isClosed) {
+            _controller.add(data);
+          }
         } catch (e) {
-          _controller.addError(e);
+          if (!_controller.isClosed) {
+            _controller.addError(e);
+          }
         }
       }
     });
@@ -90,7 +96,9 @@ class DataSyncService {
         if (online.isAfter(local)) {
           needSync = true; // Sync required
         } else {
-          _controller.add(await localDatabaseService.getRecipesDataBySection(secId));
+          if (!_controller.isClosed) {
+            _controller.add(await localDatabaseService.getRecipesDataBySection(secId));
+          }
         }
       } else {
         needSync = true; // Sync required if no local data
@@ -114,9 +122,13 @@ class DataSyncService {
             data = recipeSnap.value as List<dynamic>;
             data = data.where((recipe) => recipe['section'] == secId).toList();
           }
-          _controller.add(data);
+          if (!_controller.isClosed) {
+            _controller.add(data);
+          }
         } catch (e) {
-          _controller.addError(e);
+          if (!_controller.isClosed) {
+            _controller.addError(e);
+          }
         }
       }
     });
@@ -156,7 +168,9 @@ class DataSyncService {
         } else {
           localData = null;
         }
-        _controller.add(localData);
+        if (!_controller.isClosed) {
+          _controller.add(localData);
+        }
       }
     } else {
       needSync = true; // Sync required if no local data
@@ -194,9 +208,13 @@ class DataSyncService {
             data = null;
           }
         }
-        _controller.add(data);
+        if (!_controller.isClosed) {
+          _controller.add(data);
+        }
       } catch (e) {
-        _controller.addError(e);
+        if (!_controller.isClosed) {
+          _controller.addError(e);
+        }
       }
     }
   }

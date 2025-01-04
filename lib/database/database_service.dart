@@ -17,22 +17,22 @@ class DatabaseService {
   }
 
   // Method to update existing tree-data
-  Future<void> setBulk(String path, Map<String, dynamic> data) async {
+  Future<String> setBulk(String path, Map<String, dynamic> data) async {
     try {
       await _dbRef.child(path).set(data);
-      print('Data updated successfully at $path');
+      return 'success';
     } catch (error) {
-      print('Error updating data: $error');
+      return 'Error updating data: $error';
     }
   }
 
   // Method to update existing data
-  Future<void> set(String path, Object? data) async {
+  Future<String> set(String path, Object? data) async {
     try {
       await _dbRef.child(path).set(data);
-      print('Data updated successfully at $path');
+      return 'success';
     } catch (error) {
-      print('Error updating data: $error');
+      return 'Error updating data: $error';
     }
   }
 
@@ -171,7 +171,7 @@ class DatabaseService {
   }
 
   // Specific method for uploading image
-  Future<String?> uploadImg(Uint8List image, {required String category}) async {
+  Future<String> uploadImg(Uint8List image, {required String category}) async {
     // category is recipes or sections
     Reference ref = FirebaseStorage.instanceFor(bucket: 'gs://felix-s-cookbook.firebasestorage.app').ref().child('$category/${await idRecipe}');
     UploadTask uploadTask = ref.putData(image);
@@ -180,13 +180,12 @@ class DatabaseService {
     if (snapshot.state == TaskState.success) {
       return await ref.getDownloadURL();
     } else {
-      print('Upload failed with state: ${snapshot.state}');
-      return null;
+      return 'Upload failed with state: ${snapshot.state}';
     }
   }
 
   // Specific method for uploading a new recipe.
-  Future<void> uploadRecipe({
+  Future<String> uploadRecipe({
     required String title,
     required String sec,
     required List<Map<String,String>> ing,
@@ -211,9 +210,10 @@ class DatabaseService {
       'uploaded' : timestamp,
       'owner' : userId
     };
-    setBulk('recipes/$recipeID', recipe);
-    // Increase id counter
-    set('latestRecipeId', recipeID!+1);
+    final results = await Future.wait([
+      setBulk('recipes/$recipeID', recipe),
+      set('latestRecipeId', recipeID!+1),
+    ]);
     // Update section
     final Object? value = await get('sections/$sectionID/recipes');
     List<int> currentIdList = [];
@@ -221,13 +221,16 @@ class DatabaseService {
       currentIdList = List<int>.from(value as List<dynamic>);
     }
     currentIdList.add(recipeID);
-    set('sections/$sectionID/recipes', currentIdList);
-    // Change update timestamp
-    set('latestUpdate', timestamp);
+    results.addAll([
+      await set('sections/$sectionID/recipes', currentIdList),
+      await set('latestUpdate', timestamp)
+    ]);
+    // Return for debugging.
+    return results.firstWhere((result) => result != 'success', orElse: () => 'success');
   }
 
   // Specific method for uploading a new section.
-  Future<void> uploadSection({required String title, required String img}) async {
+  Future<String> uploadSection({required String title, required String img}) async {
     final sectionId = await idSection;
     User? user = FirebaseAuth.instance.currentUser;
     String userId = user?.uid ?? 'noUserId';
@@ -238,18 +241,22 @@ class DatabaseService {
       'title' : title,
       'owner' : userId,
     };
-    setBulk('sections/$sectionId', section);
-    // Increase id counter
-    set('latestSectionId', sectionId!+1);
     // Change update timestamp
     DateTime now = DateTime.now();
     DateFormat formatter = DateFormat('dd.MM.yyyy HH:mm:ss');
     String timestamp = formatter.format(now);
-    set('latestUpdate', timestamp);
+    // Upload
+    final results = await Future.wait([
+      setBulk('sections/$sectionId', section),
+      set('latestSectionId', sectionId!+1),
+      set('latestUpdate', timestamp)
+    ]);
+    // Return for debugging.
+    return results.firstWhere((result) => result != 'success', orElse: () => 'success');
   }
 
   // Specific method for editing an old recipe.
-  Future<void> editRecipe({
+  Future<String> editRecipe({
     required String title,
     required String sec,
     required List<Map<String,String>> ing,
@@ -274,7 +281,8 @@ class DatabaseService {
       'uploaded' : timestamp,
       'owner' : userId
     };
-    setBulk('recipes/$recipeID', recipe);
+    final List<String> results = [];
+    results.add(await setBulk('recipes/$recipeID', recipe));
     // Update section if section was changed!
     final sectionIdFromTitle = await getSectionId(sec);
     if (sectionIdFromTitle.toString() != sectionIdFromRecipe.toString()) {
@@ -285,7 +293,7 @@ class DatabaseService {
         currentIdList = List<int>.from(recipeIdListNew as List<dynamic>);
       }
       currentIdList.add(recipeID);
-      set('sections/$sectionIdFromTitle/recipes', currentIdList);
+      results.add(await set('sections/$sectionIdFromTitle/recipes', currentIdList));
 
       // Remove recipe from old section
       final Object? recipeIdListOld = await get('sections/$sectionIdFromRecipe/recipes');
@@ -294,14 +302,16 @@ class DatabaseService {
         oldIdList = List<int>.from(recipeIdListNew as List<dynamic>);
       }
       oldIdList.add(recipeID);
-      set('sections/$sectionIdFromRecipe/recipes', oldIdList);
+      results.add(await set('sections/$sectionIdFromRecipe/recipes', oldIdList));
     }
     // Change upload timestamp.
-    set('latestUpdate', timestamp);
+    results.add(await set('latestUpdate', timestamp));
+    // Return for debugging.
+    return results.firstWhere((result) => result != 'success', orElse: () => 'success');
   }
 
   // Specific method for editing an old section.
-  Future<void> editSection({
+  Future<String> editSection({
     required String title,
     required String img,
     required int sectionId
@@ -312,12 +322,15 @@ class DatabaseService {
     User? user = FirebaseAuth.instance.currentUser;
     String userId = user?.uid ?? 'noUserId';
     // Edit old section
-    set('sections/$sectionId/imageUrl', img);
-    set('sections/$sectionId/title', title);
-    set('sections/$sectionId/owner', userId);
-    set('sections/$sectionId/uploaded', timestamp);
-    // Change update timestamp.
-    set('latestUpdate', timestamp);
+    final results = await Future.wait([
+      set('sections/$sectionId/title', title),
+      set('sections/$sectionId/imageUrl', img),
+      set('sections/$sectionId/owner', userId),
+      set('sections/$sectionId/uploaded', timestamp),
+      // Change update timestamp.
+      set('latestUpdate', timestamp)
+    ]);
+    return results.firstWhere((result) => result != 'success', orElse: () => 'success');
   }
 
   // Specific method to get all the section keys

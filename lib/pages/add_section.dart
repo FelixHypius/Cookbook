@@ -2,16 +2,17 @@ import 'package:cookbook/base_widgets/base_input_field.dart';
 import 'package:cookbook/util/colors.dart';
 import 'package:cookbook/util/custom_snackbar.dart';
 import 'package:cookbook/util/custom_text_style.dart';
-import 'package:cookbook/util/navigation.dart';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import '../base_widgets/base_loading_page.dart';
 import '../base_widgets/base_scaffold.dart';
 import '../base_widgets/base_drawer.dart';
 import '../base_widgets/base_bottom_navigation_bar.dart';
 import '../base_widgets/base_button.dart';
+import '../util/custom_page_route.dart';
 import '../util/input_checks.dart';
 import '../database/database_service.dart';
 import '../specific_widgets/specific_image_picker.dart';
-import '../util/image_compression.dart' as comp;
 
 class AddSectionPage extends StatefulWidget{
 
@@ -27,62 +28,44 @@ class AddSectionPageState extends State<AddSectionPage> {
   final GlobalKey<SpecImagePickerState> _imagePickerKey = GlobalKey<SpecImagePickerState>();
   final TextEditingController _nameController = TextEditingController();
   final DatabaseService dbs = DatabaseService();
-  bool _isLoading = false;
 
-  Future<void> _save() async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    // Ensure section has title.
-    if (check.isText(_nameController.text) && (_imagePickerKey.currentState as SpecImagePickerState).image != null)  {
-      String? imageUrl = await uploadImage();
-      if (imageUrl != null) {
-        dbs.uploadSection(title: _nameController.text, img: imageUrl);
-        setState(() {
-          _isLoading = false;
-        });
-        navigateToPage(context, 1, 6);
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-            CustomSnackBar(
-                'Your image could not be uploaded.'
-            )
-        );
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    } else {
-      if ((_imagePickerKey.currentState as SpecImagePickerState).image == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          CustomSnackBar(
-              'Please upload a picture for your recipe.'
-          ),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          CustomSnackBar(
-              'Please enter a valid section title.'
-          ),
-        );
-      }
-      setState(() {
-        _isLoading = false;
-      });
-    }
+  void display (String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+        CustomSnackBar(message)
+    );
   }
 
-  Future<String?> uploadImage() async {
-    final imagePickerState = _imagePickerKey.currentState;
-    if (imagePickerState?.image == null) return null;
+  Future<void> _save() async {
+    // Ensure all inputs are correct.
+    if (!check.isText(_nameController.text)) {
+      display('Please enter a valid recipe title.');
+      return;
+    }
+    if (((_imagePickerKey.currentState as SpecImagePickerState).image == null &&
+        (_imagePickerKey.currentState as SpecImagePickerState).url == null)){
+      display('Please upload a picture for your recipe.');
+      return;
+    }
+    // Try to upload => Transfer to loading page.
+    final String title = _nameController.text;
+    final String? imageUrl = (_imagePickerKey.currentState as SpecImagePickerState).url;
+    final Uint8List? imageList = (_imagePickerKey.currentState as SpecImagePickerState).image;
 
-    try {
-      final compressedImage = await comp.compress(imagePickerState!.image!, 204800);
-      return dbs.uploadImg(compressedImage, category: "sections");
-    } catch (e) {
-      print('Error uploading image: ${e.toString()}');
-      return null;
+    final result = await Navigator.push(
+        context,
+        CustomPageRoute(
+            page: BaseLoadingPage(
+              context: context,
+              kind: 'recipe',
+              imageUrl: imageUrl,
+              imageList: imageList,
+              title: title,
+            ),
+            direction: 'none'
+        )
+    );
+    if (result != null && result is String) {
+      display(result);
     }
   }
 
@@ -100,79 +83,62 @@ class AddSectionPageState extends State<AddSectionPage> {
         scaffoldKey: _scaffoldKey,
       ),
       body: SingleChildScrollView(
-          child: Stack(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  AspectRatio(
-                    aspectRatio: 1,
-                    child: Container(
-                      decoration: BoxDecoration(
-                          color: MyColors.myBlack,
-                          border: Border.all(
-                              color: MyColors.myGrey,
-                              width: 1
-                          ),
-                          borderRadius: BorderRadius.circular(20)
+              AspectRatio(
+                aspectRatio: 1,
+                child: Container(
+                  decoration: BoxDecoration(
+                      color: MyColors.myBlack,
+                      border: Border.all(
+                          color: MyColors.myGrey,
+                          width: 1
                       ),
-                      child: SpecImagePicker(key: _imagePickerKey,),
-                    ),
+                      borderRadius: BorderRadius.circular(20)
                   ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(left: 5, right: 5),
-                    child: BaseInputField(
-                      control: _nameController,
-                      hintText: 'Enter section title',
-                      fillColour: MyColors.myBlack,
-                      normalColour: MyColors.myBlack,
-                      focusedColour: MyColors.myBlack,
-                      textColour: MyColors.myWhite,
-                      textAlignment: TextAlign.center,
-                      textSize: 20,
-                      paddingHeight: 5,
-                      hintColour: MyColors.myGrey,
-                      maxRows: 1,
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(left: 5, right: 5, top: 20),
-                    child: SizedBox(
-                      width: 70,
-                      height: 30,
-                      child: BaseButton(
-                        func: _save,
-                        icon: Icon(Icons.save_rounded, size: 25, color: MyColors.myWhite,),
-                        text: Text('save', style: CustomTextStyle(size: 15, tallness: 2), textAlign: TextAlign.center,),
-                        border: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(7.5)
-                        ),
-                        align: MainAxisAlignment.start,
-                        padding: EdgeInsets.only(left: 5),
-                        sizeSpace: 2,
-                      ),
-                    ),
-                  )
-                ],
+                  child: SpecImagePicker(key: _imagePickerKey,),
+                ),
               ),
-              if (_isLoading)
-                Positioned.fill(
-                  child: Container(
-                    color: MyColors.myBlack,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        CircularProgressIndicator(color: MyColors.myRed, strokeWidth: 5,),
-                        Text('Waiting for section upload..', style: CustomTextStyle(size: 20, colour: MyColors.myRed))
-                      ],
+              SizedBox(
+                height: 10,
+              ),
+              Padding(
+                padding: EdgeInsets.only(left: 5, right: 5),
+                child: BaseInputField(
+                  control: _nameController,
+                  hintText: 'Enter section title',
+                  fillColour: MyColors.myBlack,
+                  normalColour: MyColors.myBlack,
+                  focusedColour: MyColors.myBlack,
+                  textColour: MyColors.myWhite,
+                  textAlignment: TextAlign.center,
+                  textSize: 20,
+                  paddingHeight: 5,
+                  hintColour: MyColors.myGrey,
+                  maxRows: 1,
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(left: 5, right: 5, top: 20),
+                child: SizedBox(
+                  width: 70,
+                  height: 30,
+                  child: BaseButton(
+                    func: _save,
+                    icon: Icon(Icons.save_rounded, size: 25, color: MyColors.myWhite,),
+                    text: Text('save', style: CustomTextStyle(size: 15, tallness: 2), textAlign: TextAlign.center,),
+                    border: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(7.5)
                     ),
+                    align: MainAxisAlignment.start,
+                    padding: EdgeInsets.only(left: 5),
+                    sizeSpace: 2,
                   ),
-                )
+                ),
+              )
             ],
-          )
+          ),
       ),
     );
   }

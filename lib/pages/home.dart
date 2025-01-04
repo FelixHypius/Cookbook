@@ -29,8 +29,8 @@ class HomepageState extends State<Homepage> {
 
   @override
   void dispose() {
-    dss.dispose();
     super.dispose();
+    dss.dispose();
   }
 
   @override
