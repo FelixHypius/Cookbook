@@ -73,6 +73,9 @@ class EditRecipePageState extends State<EditRecipePage> {
                     'Your image could not be uploaded.'
                 )
             );
+            setState(() {
+              _isLoading = false;
+            });
           }
         } else {
           String oldUrl = (_imagePickerKey.currentState as SpecImagePickerState).url!;
@@ -87,42 +90,35 @@ class EditRecipePageState extends State<EditRecipePage> {
           _isLoading = false;
         });
       }
-    } else if ((_sectionDropdownKey.currentState as SpecSectionDropdownButtonState).selectedSection == null) {
-      setState(() {
-        _isLoading = false;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        CustomSnackBar(
-            'Please select a valid recipe section.'
-        ),
-      );
-    } else if ((_imagePickerKey.currentState as SpecImagePickerState).image == null && (_imagePickerKey.currentState as SpecImagePickerState).url == null) {
-      setState(() {
-        _isLoading = false;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        CustomSnackBar(
-            'Please upload a picture for your recipe.'
-        ),
-      );
-    } else if (_recipeController.text == '') {
-      setState(() {
-        _isLoading = false;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        CustomSnackBar(
-            'Please provide a recipe instruction.'
-        ),
-      );
     } else {
+      if ((_sectionDropdownKey.currentState as SpecSectionDropdownButtonState).selectedSection == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          CustomSnackBar(
+              'Please select a valid recipe section.'
+          ),
+        );
+      } else if ((_imagePickerKey.currentState as SpecImagePickerState).image == null && (_imagePickerKey.currentState as SpecImagePickerState).url == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          CustomSnackBar(
+              'Please upload a picture for your recipe.'
+          ),
+        );
+      } else if (_recipeController.text == '') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          CustomSnackBar(
+              'Please provide a recipe instruction.'
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          CustomSnackBar(
+              'Please enter a valid recipe title.'
+          ),
+        );
+      }
       setState(() {
         _isLoading = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        CustomSnackBar(
-            'Please enter a valid recipe title.'
-        ),
-      );
     }
   }
 

@@ -49,19 +49,27 @@ class AddSectionPageState extends State<AddSectionPage> {
                 'Your image could not be uploaded.'
             )
         );
+        setState(() {
+          _isLoading = false;
+        });
       }
-    } else if ((_imagePickerKey.currentState as SpecImagePickerState).image == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        CustomSnackBar(
-            'Please upload a picture for your recipe.'
-        ),
-      );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        CustomSnackBar(
-            'Please enter a valid section title.'
-        ),
-      );
+      if ((_imagePickerKey.currentState as SpecImagePickerState).image == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          CustomSnackBar(
+              'Please upload a picture for your recipe.'
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          CustomSnackBar(
+              'Please enter a valid section title.'
+          ),
+        );
+      }
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 

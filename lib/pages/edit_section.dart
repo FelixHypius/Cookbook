@@ -61,6 +61,9 @@ class EditSectionPageState extends State<EditSectionPage> {
                 'Your image could not be uploaded.',
               )
           );
+          setState(() {
+            _isLoading = false;
+          });
         }
       } else {
         String oldUrl = (_imagePickerKey.currentState as SpecImagePickerState).url!;
@@ -70,24 +73,23 @@ class EditSectionPageState extends State<EditSectionPage> {
         });
         navigateToPage(context, 1, 9);
       }
-    } else if ((_imagePickerKey.currentState as SpecImagePickerState).image == null && (_imagePickerKey.currentState as SpecImagePickerState).url == null) {
-      setState(() {
-        _isLoading = false;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        CustomSnackBar(
-            'Please upload a picture for your recipe.',
-        ),
-      );
     } else {
+      if ((_imagePickerKey.currentState as SpecImagePickerState).image == null && (_imagePickerKey.currentState as SpecImagePickerState).url == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          CustomSnackBar(
+            'Please upload a picture for your recipe.',
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          CustomSnackBar(
+            'Please enter a valid recipe title.',
+          ),
+        );
+      }
       setState(() {
         _isLoading = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        CustomSnackBar(
-            'Please enter a valid recipe title.',
-        ),
-      );
     }
   }
 
