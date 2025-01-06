@@ -163,7 +163,7 @@ class LoginPageState extends State<LoginPage> {
                         underlined: true,
                       ),
                       recognizer: TapGestureRecognizer()
-                        ..onTap = () => resetPassword
+                        ..onTap = () => resetPassword()
                     ),
                   ],
                 ),
