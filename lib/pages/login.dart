@@ -27,6 +27,8 @@ class LoginPageState extends State<LoginPage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   bool checked = false;
+  bool obscure = true;
+  bool eye = true;
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +67,7 @@ class LoginPageState extends State<LoginPage> {
                 icon: Icons.key_outlined,
                 hintText: "Enter password..",
                 control: _passwordController,
-                obscure: true,
+                obscure: obscure,
                 maxRows: 1,
                 normalColour: MyColors.myWhite,
                 fillColour: MyColors.myBlack,
@@ -73,6 +75,19 @@ class LoginPageState extends State<LoginPage> {
                 iconColour: MyColors.myWhite,
                 focusedColour: MyColors.myBrightRed,
                 hintColour: MyColors.myBrightGrey,
+                endIconButton: IconButton(
+                  icon: Icon(
+                    eye?Icons.visibility_rounded:Icons.visibility_off_rounded,
+                    color: MyColors.myBrightGrey,
+                    size: 20,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      obscure = !obscure;
+                      eye = !eye;
+                    });
+                  },
+                ),
               ),
             ),
             Row(

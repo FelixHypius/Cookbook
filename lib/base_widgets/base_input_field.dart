@@ -19,6 +19,7 @@ class BaseInputField extends TextField{
   final double? borderWidth;
   final double? paddingHeight;
   final int? maxRows;
+  final IconButton? endIconButton;
   // If it is a searchbar:
   final ValueChanged<String>? onChange;
 
@@ -26,6 +27,7 @@ class BaseInputField extends TextField{
     super.key,
     this.hintText,
     this.icon,
+    this.endIconButton,
     this.control,
     this.obscure,
     this.fillColour,
@@ -59,6 +61,7 @@ class BaseInputField extends TextField{
       prefixIcon: icon != null
           ? Icon(icon, color: iconColour ?? MyColors.myGrey,)
           : null,
+      suffixIcon: endIconButton,
       fillColor: fillColour ?? MyColors.myWhite,
       filled: true,
       focusedBorder: OutlineInputBorder(

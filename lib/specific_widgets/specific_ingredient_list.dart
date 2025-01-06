@@ -212,10 +212,14 @@ class SpecIngredientListState extends State<SpecIngredientList> {
   bool save() {
     int counter = 0;
     bool saved = true;
+    List<dynamic> deleteRows = [];
     setState(() {
       for (var row in rows) {
         counter++;
-        if (check.isQty(row['qtyC'].text) && check.isText(row['ingC'].text) && row['unitT']!='unit') {
+        final bool checkQ = check.isQty(row['qtyC'].text);
+        final bool checkC = check.isText(row['ingC'].text);
+        final bool checkU = row['unitT']!='unit';
+        if (checkQ && checkC && checkU) {
           row['qtyT'] = row['qtyC'].text;
           row['ingT'] = row['ingC'].text;
           if (row['editable']) {
@@ -223,24 +227,26 @@ class SpecIngredientListState extends State<SpecIngredientList> {
             row['ingC'].dispose();
             row['editable'] = false;
           }
-        } else if (!check.isQty(row['qtyC'].text)) {
+        } else if (!checkQ && !checkC && !checkU) {
+          deleteRows.add(row);
+        } else if (!checkQ) {
           ScaffoldMessenger.of(context).showSnackBar(
             CustomSnackBar(
-              'Please enter a valid quantity in row $counter.'
+                'Please enter a valid quantity in row $counter.'
             ),
           );
           saved = false;
-        } else if (!check.isText(row['ingC'].text)) {
+        } else if (!checkC) {
           ScaffoldMessenger.of(context).showSnackBar(
             CustomSnackBar(
-              'Please enter a valid ingredient in row $counter.'
+                'Please enter a valid ingredient in row $counter.'
             ),
           );
           saved = false;
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             CustomSnackBar(
-              'Please enter a valid unit in row $counter.'
+                'Please enter a valid unit in row $counter.'
             ),
           );
           saved = false;
@@ -253,10 +259,14 @@ class SpecIngredientListState extends State<SpecIngredientList> {
   void _addNewRow() {
     int counter = 0;
     bool addRow = true;
+    List<dynamic> deleteRows = [];
     setState(() {
       for (var row in rows) {
         counter++;
-        if (check.isQty(row['qtyC'].text) && check.isText(row['ingC'].text) && row['unitT']!='unit') {
+        final bool checkQ = check.isQty(row['qtyC'].text);
+        final bool checkC = check.isText(row['ingC'].text);
+        final bool checkU = row['unitT']!='unit';
+        if (checkQ && checkC && checkU) {
           row['qtyT'] = row['qtyC'].text;
           row['ingT'] = row['ingC'].text;
           if (row['editable']) {
@@ -264,14 +274,19 @@ class SpecIngredientListState extends State<SpecIngredientList> {
             row['ingC'].dispose();
             row['editable'] = false;
           }
-        } else if (!check.isQty(row['qtyC'].text)) {
+        } else if (!checkQ && !checkC && !checkU) {
+          deleteRows.add(row);
+          print('A');
+        } else if (!checkQ) {
+          print(!checkC);
+          print(!checkC);
           ScaffoldMessenger.of(context).showSnackBar(
             CustomSnackBar(
-              'Please enter a valid quantity (>0) in row $counter.'
+              'Please enter a valid quantity in row $counter.'
             ),
           );
           addRow = false;
-        } else if (!check.isText(row['ingC'].text)) {
+        } else if (!checkC) {
           ScaffoldMessenger.of(context).showSnackBar(
             CustomSnackBar(
               'Please enter a valid ingredient in row $counter.'
@@ -285,6 +300,11 @@ class SpecIngredientListState extends State<SpecIngredientList> {
             ),
           );
           addRow = false;
+        }
+      }
+      if (deleteRows.isNotEmpty) {
+        for (var row in deleteRows) {
+          rows.remove(row);
         }
       }
       if (addRow) {
