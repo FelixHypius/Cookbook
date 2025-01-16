@@ -42,12 +42,17 @@ class BaseLoadingPage extends StatelessWidget {
     this.imageList
   });
 
-  Future<String> _uploadImg() async {
+  Future<String> _uploadImg(String category, int? id) async {
+    String cCategory = '${category}s';
     String url = '';
     // If imageList, try to upload
     if (imageList != null) {
       final compressedImage = await comp.compress(imageList!, 204800);
-      url = await dbs.uploadImg(compressedImage, category: "recipes");
+      if (id == null) {
+        url = await dbs.uploadImg(compressedImage, category: cCategory);
+      } else {
+        url = await dbs.uploadImg(compressedImage, category: cCategory, id: id);
+      }
       if (url.contains('Upload failed with state')) {
         failed(url);
       }
@@ -63,12 +68,11 @@ class BaseLoadingPage extends StatelessWidget {
   }
   
   Future<void> save() async {
-    // Try uploading image.
-    final url = await _uploadImg();
-
     String result = '';
     // Try uploading recipe/section.
     if (kind == 'recipe') {
+      // Try uploading image.
+      final url = await _uploadImg(kind, recId);
       // Differentiate between editing and creating.
       if (recId != null) {
         result = await dbs.editRecipe(title: title, img: url, recipeID: recId!, sec: section!, ing: ingredientList!, description: description!);
@@ -76,6 +80,8 @@ class BaseLoadingPage extends StatelessWidget {
         result = await dbs.uploadRecipe(title: title, img: url, ing: ingredientList!, description: description!, sec: section!);
       }
     } else if (kind == 'section') {
+      // Try uploading image.
+      final url = await _uploadImg(kind, secId);
       // Differentiate between editing and creating.
       if (secId != null) {
         result = await dbs.editSection(title: title, img: url, sectionId: secId!);

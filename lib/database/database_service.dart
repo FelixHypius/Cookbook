@@ -171,16 +171,19 @@ class DatabaseService {
   }
 
   // Specific method for uploading image
-  Future<String> uploadImg(Uint8List image, {required String category}) async {
-    // category is recipes or sections
-    Reference ref = FirebaseStorage.instanceFor(bucket: 'gs://felix-s-cookbook.firebasestorage.app').ref().child('$category/${await idRecipe}');
-    UploadTask uploadTask = ref.putData(image);
-    TaskSnapshot snapshot = await uploadTask;
-
-    if (snapshot.state == TaskState.success) {
-      return await ref.getDownloadURL();
+  Future<String> uploadImg(Uint8List image, {required String category, int? id}) async {
+    int? idC = id ?? (category == 'recipes' ? await idRecipe : await idSection);
+    if (idC != null) {
+      Reference ref = FirebaseStorage.instanceFor(bucket: 'gs://felix-s-cookbook.firebasestorage.app').ref().child('$category/$idC}');
+      UploadTask uploadTask = ref.putData(image);
+      TaskSnapshot snapshot = await uploadTask;
+      if (snapshot.state == TaskState.success) {
+        return await ref.getDownloadURL();
+      } else {
+        return 'Upload failed with state: ${snapshot.state}';
+      }
     } else {
-      return 'Upload failed with state: ${snapshot.state}';
+      return 'Error fetching recipe/section id while trying to upload image.';
     }
   }
 
