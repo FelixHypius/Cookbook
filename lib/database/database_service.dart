@@ -3,9 +3,20 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:intl/intl.dart';
+import 'package:cookbook/util/patch_notes.dart';
 
 class DatabaseService {
   final DatabaseReference _dbRef = FirebaseDatabase.instance.ref();
+  final PatchNotes pn = PatchNotes();
+
+  // Method to check if user as newest app version.
+  Future<bool> check() async {
+    final v = pn.version;
+    if (v == await get('version')) {
+      return true;
+    }
+    return false;
+  }
 
   // Method to get data from the database
   Future<Object?> get(String path) async {
@@ -18,6 +29,9 @@ class DatabaseService {
 
   // Method to update existing tree-data
   Future<String> setBulk(String path, Map<String, dynamic> data) async {
+    if (!await check()) {
+      return 'Your app does not have the newest version.';
+    }
     try {
       await _dbRef.child(path).set(data);
       return 'success';
@@ -28,6 +42,9 @@ class DatabaseService {
 
   // Method to update existing data
   Future<String> set(String path, Object? data) async {
+    if (!await check()) {
+      return 'Your app does not have the newest version.';
+    }
     try {
       await _dbRef.child(path).set(data);
       return 'success';
@@ -172,6 +189,9 @@ class DatabaseService {
 
   // Specific method for uploading image
   Future<String> uploadImg(Uint8List image, {required String category, int? id}) async {
+    if (!await check()) {
+      return 'Your app does not have the newest version.';
+    }
     int? idC = id ?? (category == 'recipes' ? await idRecipe : await idSection);
     if (idC != null) {
       Reference ref = FirebaseStorage.instanceFor(bucket: 'gs://felix-s-cookbook.firebasestorage.app').ref().child('$category/$idC}');
@@ -195,6 +215,9 @@ class DatabaseService {
     required String img,
     required String description
   }) async {
+    if (!await check()) {
+      return 'Your app does not have the newest version.';
+    }
     final recipeID = await idRecipe;
     final sectionID = await getSectionId(sec);
     DateTime now = DateTime.now();
@@ -234,6 +257,9 @@ class DatabaseService {
 
   // Specific method for uploading a new section.
   Future<String> uploadSection({required String title, required String img}) async {
+    if (!await check()) {
+      return 'Your app does not have the newest version.';
+    }
     final sectionId = await idSection;
     User? user = FirebaseAuth.instance.currentUser;
     String userId = user?.uid ?? 'noUserId';
@@ -267,6 +293,9 @@ class DatabaseService {
     required String description,
     required int recipeID
   }) async {
+    if (!await check()) {
+      return 'Your app does not have the newest version.';
+    }
     final sectionIdFromRecipe = await getSectionFromRecipe(recipeID);
     DateTime now = DateTime.now();
     DateFormat formatter = DateFormat('dd.MM.yyyy HH:mm:ss');
@@ -319,6 +348,9 @@ class DatabaseService {
     required String img,
     required int sectionId
   }) async {
+    if (!await check()) {
+      return 'Your app does not have the newest version.';
+    }
     DateTime now = DateTime.now();
     DateFormat formatter = DateFormat('dd.MM.yyyy HH:mm:ss');
     String timestamp = formatter.format(now);
